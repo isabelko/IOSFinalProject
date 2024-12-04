@@ -157,26 +157,56 @@ class NewsViewController: UIViewController, UITableViewDataSource, UITableViewDe
     private var featuredStory: (title: String, url: String, images: [String])?
     private var news: [(title: String, url: String, images: [String])] = []
     private let tableView = UITableView()
+    
+    // Add the title label
+    private let titleLabel: UILabel = {
+        let label = UILabel()
+        label.text = "Climbing News"
+        label.font = .systemFont(ofSize: 24, weight: .bold)
+        label.textAlignment = .center
+        label.translatesAutoresizingMaskIntoConstraints = false
+        return label
+    }()
 
     override func viewDidLoad() {
         super.viewDidLoad()
         view.backgroundColor = .systemBackground
         title = "Climbing News"
 
+        // Set the tab bar's appearance to solid
+        tabBarController?.tabBar.isTranslucent = false
+        tabBarController?.tabBar.barTintColor = .white  // Set a solid color for the tab bar
+        
+        setupTitleLabel()  // Add the title label setup
         setupTableView()
         fetchNews()
+    }
+
+    // Function to setup the title label
+    private func setupTitleLabel() {
+        view.addSubview(titleLabel)
+        
+        NSLayoutConstraint.activate([
+            titleLabel.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 10),
+            titleLabel.leadingAnchor.constraint(equalTo: view.leadingAnchor),
+            titleLabel.trailingAnchor.constraint(equalTo: view.trailingAnchor),
+            titleLabel.heightAnchor.constraint(equalToConstant: 40)  // Adjust height as needed
+        ])
     }
 
     private func setupTableView() {
         view.addSubview(tableView)
         tableView.translatesAutoresizingMaskIntoConstraints = false
         NSLayoutConstraint.activate([
-            tableView.topAnchor.constraint(equalTo: view.topAnchor),
+            tableView.topAnchor.constraint(equalTo: titleLabel.bottomAnchor, constant: 10), // Add space below title
             tableView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
             tableView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
-            tableView.bottomAnchor.constraint(equalTo: view.bottomAnchor)
+            tableView.bottomAnchor.constraint(equalTo: view.bottomAnchor)  // Ensure it doesn't go behind tab bar
         ])
 
+        // Adjust content inset to avoid going under the tab bar
+        tableView.contentInset = UIEdgeInsets(top: 0, left: 0, bottom: tabBarController?.tabBar.frame.height ?? 0, right: 0)
+        
         tableView.dataSource = self
         tableView.delegate = self
         tableView.register(FeaturedNewsCell.self, forCellReuseIdentifier: FeaturedNewsCell.identifier)
