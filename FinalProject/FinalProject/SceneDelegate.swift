@@ -5,7 +5,6 @@
 //  Created by Isak Sabelko on 11/19/24.
 //
 
-
 import UIKit
 
 class SceneDelegate: UIResponder, UIWindowSceneDelegate {
@@ -19,13 +18,55 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
     ) {
         guard let windowScene = (scene as? UIWindowScene) else { return }
 
+        let tabBarController = UITabBarController()
+        tabBarController.viewControllers = [
+            createViewController(for: NewsViewController(), title: "News", imageName: "newspaper"),
+            createViewController(for: ViewClimbsViewController(), title: "View Climbs", imageName: "list.bullet"),
+            createViewController(for: LogClimbViewController(), title: "Log Climb", imageName: "plus"),
+            createNavController(for: SettingsViewController(), title: "Settings", imageName: "gear")
+        ]
+
         let window = UIWindow(windowScene: windowScene)
-        let navigationController = UINavigationController(rootViewController: MainViewController())
-        window.rootViewController = navigationController
+        window.rootViewController = tabBarController
         window.makeKeyAndVisible()
         self.window = window
     }
+
+    private func createNavController(for rootViewController: UIViewController, title: String, imageName: String) -> UINavigationController {
+        let navController = UINavigationController(rootViewController: rootViewController)
+        navController.tabBarItem.title = title
+        navController.tabBarItem.image = UIImage(systemName: imageName)
+        rootViewController.navigationItem.title = title
+        return navController
+    }
+
+    private func createViewController(for viewController: UIViewController, title: String, imageName: String) -> UIViewController {
+        viewController.tabBarItem.title = title
+        viewController.tabBarItem.image = UIImage(systemName: imageName)
+        return viewController
+    }
 }
+
+//import UIKit
+//
+//class SceneDelegate: UIResponder, UIWindowSceneDelegate {
+//
+//    var window: UIWindow?
+//
+//    func scene(
+//        _ scene: UIScene,
+//        willConnectTo session: UISceneSession,
+//        options connectionOptions: UIScene.ConnectionOptions
+//    ) {
+//        guard let windowScene = (scene as? UIWindowScene) else { return }
+//
+//        let window = UIWindow(windowScene: windowScene)
+//        let navigationController = UINavigationController(rootViewController: MainViewController())
+//        window.rootViewController = navigationController
+//        window.makeKeyAndVisible()
+//        self.window = window
+//    }
+//}
 
 //import UIKit
 //

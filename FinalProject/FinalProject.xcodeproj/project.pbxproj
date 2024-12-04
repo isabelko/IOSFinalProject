@@ -19,6 +19,8 @@
 		7C3D32782D010E1600C2E8DF /* SettingViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7C3D32772D010E1600C2E8DF /* SettingViewController.swift */; };
 		7C3D327A2D010E4C00C2E8DF /* ViewClimbsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7C3D32792D010E4C00C2E8DF /* ViewClimbsViewController.swift */; };
 		7C3D327C2D010ED400C2E8DF /* LogClimbViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7C3D327B2D010ED400C2E8DF /* LogClimbViewController.swift */; };
+		7C3D327E2D01104F00C2E8DF /* NewsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7C3D327D2D01104F00C2E8DF /* NewsViewController.swift */; };
+		7C3D32812D01112400C2E8DF /* SwiftSoup in Frameworks */ = {isa = PBXBuildFile; productRef = 7C3D32802D01112400C2E8DF /* SwiftSoup */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -55,6 +57,7 @@
 		7C3D32772D010E1600C2E8DF /* SettingViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingViewController.swift; sourceTree = "<group>"; };
 		7C3D32792D010E4C00C2E8DF /* ViewClimbsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewClimbsViewController.swift; sourceTree = "<group>"; };
 		7C3D327B2D010ED400C2E8DF /* LogClimbViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LogClimbViewController.swift; sourceTree = "<group>"; };
+		7C3D327D2D01104F00C2E8DF /* NewsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewsViewController.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -62,6 +65,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				7C3D32812D01112400C2E8DF /* SwiftSoup in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -115,6 +119,7 @@
 				7C3D32772D010E1600C2E8DF /* SettingViewController.swift */,
 				7C3D32792D010E4C00C2E8DF /* ViewClimbsViewController.swift */,
 				7C3D327B2D010ED400C2E8DF /* LogClimbViewController.swift */,
+				7C3D327D2D01104F00C2E8DF /* NewsViewController.swift */,
 			);
 			path = FinalProject;
 			sourceTree = "<group>";
@@ -152,6 +157,9 @@
 			dependencies = (
 			);
 			name = FinalProject;
+			packageProductDependencies = (
+				7C3D32802D01112400C2E8DF /* SwiftSoup */,
+			);
 			productName = FinalProject;
 			productReference = 7C3D32442CED378700C2E8DF /* FinalProject.app */;
 			productType = "com.apple.product-type.application";
@@ -224,6 +232,9 @@
 				Base,
 			);
 			mainGroup = 7C3D323B2CED378700C2E8DF;
+			packageReferences = (
+				7C3D327F2D01112400C2E8DF /* XCRemoteSwiftPackageReference "SwiftSoup" */,
+			);
 			productRefGroup = 7C3D32452CED378700C2E8DF /* Products */;
 			projectDirPath = "";
 			projectRoot = "";
@@ -271,6 +282,7 @@
 				7C3D32482CED378700C2E8DF /* AppDelegate.swift in Sources */,
 				7C3D327A2D010E4C00C2E8DF /* ViewClimbsViewController.swift in Sources */,
 				7C3D324A2CED378700C2E8DF /* SceneDelegate.swift in Sources */,
+				7C3D327E2D01104F00C2E8DF /* NewsViewController.swift in Sources */,
 				7C3D32782D010E1600C2E8DF /* SettingViewController.swift in Sources */,
 				7C3D327C2D010ED400C2E8DF /* LogClimbViewController.swift in Sources */,
 			);
@@ -619,6 +631,25 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		7C3D327F2D01112400C2E8DF /* XCRemoteSwiftPackageReference "SwiftSoup" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/scinfu/SwiftSoup";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 2.7.6;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		7C3D32802D01112400C2E8DF /* SwiftSoup */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 7C3D327F2D01112400C2E8DF /* XCRemoteSwiftPackageReference "SwiftSoup" */;
+			productName = SwiftSoup;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = 7C3D323C2CED378700C2E8DF /* Project object */;
 }
