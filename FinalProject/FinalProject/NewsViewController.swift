@@ -1,4 +1,3 @@
-//
 //  NewsViewController.swift
 //  FinalProject
 //
@@ -68,6 +67,7 @@ class FeaturedNewsCell: UITableViewCell {
     }
 }
 
+// NewsCell
 class NewsCell: UITableViewCell {
     static let identifier = "NewsCell"
     
@@ -76,7 +76,7 @@ class NewsCell: UITableViewCell {
     
     var isFeatured: Bool = false {
         didSet {
-            customImageView.isHidden = !isFeatured
+            customImageView.isHidden = !isFeatured  // Hide the image for non-featured stories
             updateConstraintsForFeatured(isFeatured)
         }
     }
@@ -140,7 +140,7 @@ class NewsCell: UITableViewCell {
     func configure(with title: String, imageURL: String) {
         titleLabel.text = title
         
-        if let url = URL(string: imageURL) {
+        if isFeatured, let url = URL(string: imageURL) {
             URLSession.shared.dataTask(with: url) { data, _, _ in
                 if let data = data, let image = UIImage(data: data) {
                     DispatchQueue.main.async {
@@ -152,9 +152,9 @@ class NewsCell: UITableViewCell {
     }
 }
 
-
-//controller
+// NewsViewController
 class NewsViewController: UIViewController, UITableViewDataSource, UITableViewDelegate {
+    private var featuredStory: (title: String, url: String, images: [String])?
     private var news: [(title: String, url: String, images: [String])] = []
     private let tableView = UITableView()
 
@@ -185,7 +185,7 @@ class NewsViewController: UIViewController, UITableViewDataSource, UITableViewDe
 
     private func fetchNews() {
         guard let url = URL(string: "https://www.outsideonline.com/climbing/") else { return }
-        
+
         let task = URLSession.shared.dataTask(with: url) { [weak self] data, response, error in
             guard let self = self, let data = data, error == nil else {
                 print("Failed to fetch news: \(error?.localizedDescription ?? "Unknown error")")
@@ -195,20 +195,20 @@ class NewsViewController: UIViewController, UITableViewDataSource, UITableViewDe
             do {
                 let html = String(data: data, encoding: .utf8) ?? ""
                 let document = try SwiftSoup.parse(html)
-                
+
                 let articles = try document.select("a.o-heading__link").array()
-                for article in articles {
+                for (index, article) in articles.enumerated() {
                     let title = try article.text()
                     let link = try article.attr("href")
-                    let completeURL = link.starts(with: "http") ? link : "https://www.outsideonline.com\(link)"
-                    
+                    let completeURL = link.starts(with: "http") ? link : "https://www.outsideonline.com" + (link.starts(with: "/") ? "" : "/") + link
+
                     let articlePageURL = URL(string: completeURL)!
                     let articleTask = URLSession.shared.dataTask(with: articlePageURL) { [weak self] data, response, error in
                         guard let self = self, let data = data, error == nil else {
                             print("Failed to fetch article page: \(error?.localizedDescription ?? "Unknown error")")
                             return
                         }
-                        
+
                         do {
                             let articleHTML = String(data: data, encoding: .utf8) ?? ""
                             let articleDocument = try SwiftSoup.parse(articleHTML)
@@ -217,9 +217,14 @@ class NewsViewController: UIViewController, UITableViewDataSource, UITableViewDe
                             let fullImageUrls = imageUrls.map { url in
                                 url.starts(with: "http") ? url : "https://www.outsideonline.com\(url)"
                             }
-                            
-                            self.news.append((title: title, url: completeURL, images: fullImageUrls))
-                            
+
+                            // Use the first article as the featured story
+                            if index == 0 {
+                                self.featuredStory = (title: title, url: completeURL, images: fullImageUrls)
+                            } else {
+                                self.news.append((title: title, url: completeURL, images: fullImageUrls))
+                            }
+
                             DispatchQueue.main.async {
                                 self.tableView.reloadData()
                             }
@@ -227,46 +232,42 @@ class NewsViewController: UIViewController, UITableViewDataSource, UITableViewDe
                             print("Error parsing article for images: \(error)")
                         }
                     }
-                    
+
                     articleTask.resume()
                 }
             } catch {
                 print("Error parsing HTML: \(error)")
             }
         }
-        
+
         task.resume()
     }
 
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return news.isEmpty ? 0 : news.count + 1 // +1 for the featured story
+        return news.isEmpty ? 0 : news.count + (featuredStory != nil ? 1 : 0)
     }
 
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        // Print statement for debugging
-        print("Table view row: \(indexPath.row), news count: \(news.count)")
-
-        if indexPath.row == 0, let firstStory = news.first {
+        if let featuredStory = featuredStory, indexPath.row == 0 {
             // Configure the featured news cell
             let cell = tableView.dequeueReusableCell(withIdentifier: FeaturedNewsCell.identifier, for: indexPath) as! FeaturedNewsCell
-            cell.configure(with: firstStory.title, imageURL: firstStory.images.first ?? "")
+            cell.configure(with: featuredStory.title, imageURL: featuredStory.images.first ?? "")
             return cell
         } else {
-            // Adjust the index for the rest of the cells
-            let adjustedIndex = indexPath.row - 1 // Adjust for the featured story offset
+            // Adjust the index for the regular news cells (skip the first featured cell)
+            let adjustedIndex = indexPath.row - (featuredStory != nil ? 1 : 0)
 
-            // Check if the adjusted index is within bounds
+            // Ensure the adjusted index is within bounds
             guard adjustedIndex < news.count else {
                 print("Index out of range when creating cell for row: \(indexPath.row)")
-                return UITableViewCell() // Return an empty cell to avoid crash
+                return UITableViewCell() // Return an empty cell to avoid a crash
             }
-            
+
+            // Configure the cell for the regular news article
             let cell = tableView.dequeueReusableCell(withIdentifier: NewsCell.identifier, for: indexPath) as! NewsCell
             let article = news[adjustedIndex]
-
-            // Configure the cell with title only if it's not featured
-            cell.isFeatured = false // Ensure this is set for non-featured cells
-            cell.configure(with: article.title, imageURL: article.images.first ?? "")
+            cell.isFeatured = false // Hide the image for non-featured cells
+            cell.configure(with: article.title, imageURL: "") // No image for non-featured articles
             return cell
         }
     }
@@ -275,16 +276,26 @@ class NewsViewController: UIViewController, UITableViewDataSource, UITableViewDe
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         tableView.deselectRow(at: indexPath, animated: true)
         
-        // Check that the index is valid before accessing
-        guard indexPath.row < news.count else {
-            print("Index out of range")
-            return
-        }
-        
-        let article = news[indexPath.row]
-        if let url = URL(string: article.url) {
-            UIApplication.shared.open(url)
+        // Check if the selected row corresponds to the featured story
+        if indexPath.row == 0, let firstStory = featuredStory {
+            // If the first cell (the featured story) is selected, use its URL
+            if let url = URL(string: firstStory.url) {
+                UIApplication.shared.open(url)
+            }
+        } else {
+            // Adjust for the offset when selecting a non-featured news cell
+            let adjustedIndex = indexPath.row - (featuredStory != nil ? 1 : 0)
+            
+            // Ensure the adjusted index is valid before accessing
+            guard adjustedIndex < news.count else {
+                print("Index out of range")
+                return
+            }
+            
+            let article = news[adjustedIndex]
+            if let url = URL(string: article.url) {
+                UIApplication.shared.open(url)
+            }
         }
     }
 }
-
