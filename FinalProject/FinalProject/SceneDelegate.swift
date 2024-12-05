@@ -7,15 +7,13 @@
 
 import UIKit
 
+import UIKit
+
 class SceneDelegate: UIResponder, UIWindowSceneDelegate {
 
     var window: UIWindow?
 
-    func scene(
-        _ scene: UIScene,
-        willConnectTo session: UISceneSession,
-        options connectionOptions: UIScene.ConnectionOptions
-    ) {
+    func scene(_ scene: UIScene, willConnectTo session: UISceneSession, options connectionOptions: UIScene.ConnectionOptions) {
         guard let windowScene = (scene as? UIWindowScene) else { return }
 
         let tabBarController = UITabBarController()
@@ -25,6 +23,10 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
             createViewController(for: LogClimbViewController(), title: "Log Climb", imageName: "plus"),
             createNavController(for: SettingsViewController(), title: "Settings", imageName: "gear")
         ]
+
+        // Add a pan gesture recognizer
+        let panGesture = UIPanGestureRecognizer(target: self, action: #selector(handlePanGesture(_:)))
+        tabBarController.view.addGestureRecognizer(panGesture)
 
         let window = UIWindow(windowScene: windowScene)
         window.rootViewController = tabBarController
@@ -45,7 +47,28 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         viewController.tabBarItem.image = UIImage(systemName: imageName)
         return viewController
     }
+
+    @objc private func handlePanGesture(_ gesture: UIPanGestureRecognizer) {
+        let translation = gesture.translation(in: gesture.view)
+
+        // Check for a horizontal swipe to the left with a sufficient distance
+        if gesture.state == .ended && translation.x < -200 { // Adjust -200 for larger swipes
+            guard let tabBarController = window?.rootViewController as? UITabBarController else { return }
+
+            // Find the index of the "Log Climb" tab
+            guard let logClimbIndex = tabBarController.viewControllers?.firstIndex(where: {
+                ($0.tabBarItem.title == "Log Climb")
+            }) else {
+                print("Log Climb tab not found")
+                return
+            }
+
+            tabBarController.selectedIndex = logClimbIndex
+        }
+    }
 }
+
+
 
 //import UIKit
 //
