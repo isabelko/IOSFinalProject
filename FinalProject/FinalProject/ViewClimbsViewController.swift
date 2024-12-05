@@ -2,7 +2,7 @@
 //  ViewClimbsViewController.swift
 //  FinalProject
 //
-//  Created by Isak Sabelko on 12/4/24.
+//  Created by Isak Sabelko on 11/19/24.
 //
 
 import Foundation
