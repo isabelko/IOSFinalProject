@@ -1,7 +1,7 @@
 //  NewsViewController.swift
 //  FinalProject
 //
-//  Created by Isak Sabelko on 12/4/24.
+//  Created by Isak Sabelko on 12/1/24.
 //
 
 import Foundation
@@ -76,7 +76,7 @@ class NewsCell: UITableViewCell {
     
     var isFeatured: Bool = false {
         didSet {
-            customImageView.isHidden = !isFeatured  // Hide the image for non-featured stories
+            customImageView.isHidden = !isFeatured  // Hide the image for stories not featured
             updateConstraintsForFeatured(isFeatured)
         }
     }
@@ -85,7 +85,7 @@ class NewsCell: UITableViewCell {
         super.init(style: style, reuseIdentifier: reuseIdentifier)
         
         titleLabel.font = .systemFont(ofSize: 16)
-        titleLabel.numberOfLines = 0 // Allow for multiple lines
+        titleLabel.numberOfLines = 0
         titleLabel.translatesAutoresizingMaskIntoConstraints = false
         contentView.addSubview(titleLabel)
         
@@ -95,7 +95,7 @@ class NewsCell: UITableViewCell {
         contentView.addSubview(customImageView)
         
         // Set up initial constraints for when the image is present
-        updateConstraintsForFeatured(true)
+//        updateConstraintsForFeatured(true)
     }
     
     private func updateConstraintsForFeatured(_ isFeatured: Bool) {
@@ -130,12 +130,12 @@ class NewsCell: UITableViewCell {
         fatalError("init(coder:) has not been implemented")
     }
     
-    override func prepareForReuse() {
-        super.prepareForReuse()
-        // Reset the image and text when the cell is reused
-        customImageView.image = nil
-        titleLabel.text = nil
-    }
+//    override func prepareForReuse() {
+//        super.prepareForReuse()
+//        // Reset the image and text when the cell is reused
+//        customImageView.image = nil
+//        titleLabel.text = nil
+//    }
     
     func configure(with title: String, imageURL: String) {
         titleLabel.text = title

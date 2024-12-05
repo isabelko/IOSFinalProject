@@ -2,7 +2,7 @@
 //  LogClimbViewController.swift
 //  FinalProject
 //
-//  Created by Isak Sabelko on 12/4/24.
+//  Created by Isak Sabelko on 12/1/24.
 //
 
 import UIKit

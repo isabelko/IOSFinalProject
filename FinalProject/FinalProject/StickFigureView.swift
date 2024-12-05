@@ -2,7 +2,7 @@
 //  StickFigureView.swift
 //  FinalProject
 //
-//  Created by Isak Sabelko on 12/4/24.
+//  Created by Isak Sabelko on 12/1/24.
 //
 //overlaps on top of the log climb view
 import Foundation
@@ -121,7 +121,7 @@ class StickFigureView: UIView {
 
 
     private func connectJoints(from: UIView, to: UIView) {
-        let line = CAShapeLayer()
+        let line = CAShapeLayer() // Allows me to use UIbezierpath later for drawing and updating the line
         line.strokeColor = limbColor.cgColor
         line.lineWidth = 2
         layer.addSublayer(line)

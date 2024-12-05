@@ -4,9 +4,9 @@
 //
 //  Created by Isak Sabelko on 12/4/24.
 //
+//will be a uinavcontroller
 
 import Foundation
-
 import UIKit
 
 class SettingsViewController: UIViewController {
@@ -15,22 +15,37 @@ class SettingsViewController: UIViewController {
         super.viewDidLoad()
         view.backgroundColor = .systemBackground
 
-        let button = UIButton(type: .system)
-        button.setTitle("Go to Sub-Settings", for: .normal)
-        button.addTarget(self, action: #selector(openSubSettings), for: .touchUpInside)
+        // Add a button for the test setting just to show myself that it is a uinavcontroller
+        let testSettingButton = UIButton(type: .system)
+        testSettingButton.setTitle("Test Setting", for: .normal)
+        testSettingButton.addTarget(self, action: #selector(openTestSetting), for: .touchUpInside)
 
-        view.addSubview(button)
-        button.translatesAutoresizingMaskIntoConstraints = false
+        view.addSubview(testSettingButton)
+        testSettingButton.translatesAutoresizingMaskIntoConstraints = false
         NSLayoutConstraint.activate([
-            button.centerXAnchor.constraint(equalTo: view.centerXAnchor),
-            button.centerYAnchor.constraint(equalTo: view.centerYAnchor)
+            testSettingButton.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+            testSettingButton.centerYAnchor.constraint(equalTo: view.centerYAnchor)
         ])
     }
 
-    @objc private func openSubSettings() {
-        let subSettingsVC = UIViewController()
-        subSettingsVC.view.backgroundColor = .systemGray6
-        subSettingsVC.title = "Sub-Settings"
-        navigationController?.pushViewController(subSettingsVC, animated: true)
+    @objc private func openTestSetting() {
+        let testSettingVC = UIViewController()
+        testSettingVC.view.backgroundColor = .systemGray6
+        testSettingVC.title = "Test Setting Screen"
+
+        let label = UILabel()
+        label.text = "This is a test setting screen."
+        label.font = .systemFont(ofSize: 18, weight: .medium)
+        label.textAlignment = .center
+        label.translatesAutoresizingMaskIntoConstraints = false
+
+        testSettingVC.view.addSubview(label)
+        NSLayoutConstraint.activate([
+            label.centerXAnchor.constraint(equalTo: testSettingVC.view.centerXAnchor),
+            label.centerYAnchor.constraint(equalTo: testSettingVC.view.centerYAnchor)
+        ])
+
+        // Push the test setting screen onto top of stack! :) yay
+        navigationController?.pushViewController(testSettingVC, animated: true)
     }
 }
