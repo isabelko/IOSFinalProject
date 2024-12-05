@@ -5,11 +5,12 @@
 //  Created by Isak Sabelko on 11/19/24.
 //
 //this has kinda become my main view controller because it is the news view controller for the nav controlelr
+//also opens to here
 
 import UIKit
 import SwiftSoup
 
-class NewsViewController: UIViewController, UITableViewDataSource, UITableViewDelegate {
+class MainViewController: UIViewController, UITableViewDataSource, UITableViewDelegate {
     private var featuredStory: (title: String, url: String, images: [String])?
     private var news: [(title: String, url: String, images: [String])] = []
     private let tableView = UITableView()

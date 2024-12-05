@@ -21,6 +21,7 @@
 		7C3D327C2D010ED400C2E8DF /* LogClimbViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7C3D327B2D010ED400C2E8DF /* LogClimbViewController.swift */; };
 		7C3D327E2D01104F00C2E8DF /* NewsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7C3D327D2D01104F00C2E8DF /* NewsViewController.swift */; };
 		7C3D32812D01112400C2E8DF /* SwiftSoup in Frameworks */ = {isa = PBXBuildFile; productRef = 7C3D32802D01112400C2E8DF /* SwiftSoup */; };
+		7C3D32832D01332C00C2E8DF /* StickFigureView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7C3D32822D01332C00C2E8DF /* StickFigureView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -58,6 +59,7 @@
 		7C3D32792D010E4C00C2E8DF /* ViewClimbsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewClimbsViewController.swift; sourceTree = "<group>"; };
 		7C3D327B2D010ED400C2E8DF /* LogClimbViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LogClimbViewController.swift; sourceTree = "<group>"; };
 		7C3D327D2D01104F00C2E8DF /* NewsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewsViewController.swift; sourceTree = "<group>"; };
+		7C3D32822D01332C00C2E8DF /* StickFigureView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StickFigureView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -120,6 +122,7 @@
 				7C3D32792D010E4C00C2E8DF /* ViewClimbsViewController.swift */,
 				7C3D327B2D010ED400C2E8DF /* LogClimbViewController.swift */,
 				7C3D327D2D01104F00C2E8DF /* NewsViewController.swift */,
+				7C3D32822D01332C00C2E8DF /* StickFigureView.swift */,
 			);
 			path = FinalProject;
 			sourceTree = "<group>";
@@ -281,6 +284,7 @@
 				7C3D324C2CED378700C2E8DF /* MainViewController.swift in Sources */,
 				7C3D32482CED378700C2E8DF /* AppDelegate.swift in Sources */,
 				7C3D327A2D010E4C00C2E8DF /* ViewClimbsViewController.swift in Sources */,
+				7C3D32832D01332C00C2E8DF /* StickFigureView.swift in Sources */,
 				7C3D324A2CED378700C2E8DF /* SceneDelegate.swift in Sources */,
 				7C3D327E2D01104F00C2E8DF /* NewsViewController.swift in Sources */,
 				7C3D32782D010E1600C2E8DF /* SettingViewController.swift in Sources */,

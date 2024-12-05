@@ -18,7 +18,7 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
 
         let tabBarController = UITabBarController()
         tabBarController.viewControllers = [
-            createViewController(for: NewsViewController(), title: "News", imageName: "newspaper"),
+            createViewController(for: MainViewController(), title: "News", imageName: "newspaper"),
             createViewController(for: ViewClimbsViewController(), title: "View Climbs", imageName: "list.bullet"),
             createViewController(for: LogClimbViewController(), title: "Log Climb", imageName: "plus"),
             createNavController(for: SettingsViewController(), title: "Settings", imageName: "gear")
