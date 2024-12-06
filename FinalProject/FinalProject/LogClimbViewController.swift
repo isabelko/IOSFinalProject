@@ -7,11 +7,12 @@
 
 import UIKit
 
+
 class LogClimbViewController: UIViewController, UIImagePickerControllerDelegate, UINavigationControllerDelegate, UIColorPickerViewControllerDelegate {
 
     private var uploadedImageView: UIImageView!
     private var stickFigureView: StickFigureView!
-    private var buttonStackView: UIStackView!
+    private var settingsButton: UIButton!
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -31,7 +32,7 @@ class LogClimbViewController: UIViewController, UIImagePickerControllerDelegate,
             uploadedImageView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
             uploadedImageView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
             uploadedImageView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
-            uploadedImageView.heightAnchor.constraint(equalTo: view.heightAnchor, multiplier: 0.5)
+            uploadedImageView.heightAnchor.constraint(equalTo: view.heightAnchor, multiplier: 0.85) // Larger height was .7
         ])
 
         // Stick Figure View overlay
@@ -46,33 +47,37 @@ class LogClimbViewController: UIViewController, UIImagePickerControllerDelegate,
             stickFigureView.bottomAnchor.constraint(equalTo: uploadedImageView.bottomAnchor)
         ])
 
-        // Buttons for image upload and color pickers
-        let uploadButton = UIButton(type: .system)
-        uploadButton.setTitle("Upload Image", for: .normal) // Corrected
-        uploadButton.addTarget(self, action: #selector(uploadImageTapped), for: .touchUpInside)
-
-        let jointColorButton = UIButton(type: .system)
-        jointColorButton.setTitle("Change Joint Color", for: .normal) // Corrected
-        jointColorButton.addTarget(self, action: #selector(changeJointColorTapped), for: .touchUpInside)
-
-        let limbColorButton = UIButton(type: .system)
-        limbColorButton.setTitle("Change Limb Color", for: .normal) // Corrected
-        limbColorButton.addTarget(self, action: #selector(changeLimbColorTapped), for: .touchUpInside)
-
-
-        // Stack view to organize buttons
-        buttonStackView = UIStackView(arrangedSubviews: [uploadButton, jointColorButton, limbColorButton])
-        buttonStackView.axis = .vertical
-        buttonStackView.spacing = 16
-        buttonStackView.alignment = .center
-        buttonStackView.translatesAutoresizingMaskIntoConstraints = false
-        view.addSubview(buttonStackView)
+        // Settings Button with Drop-down Menu
+        settingsButton = UIButton(type: .system)
+        settingsButton.setTitle("Settings", for: .normal)
+        settingsButton.translatesAutoresizingMaskIntoConstraints = false
+        settingsButton.menu = createSettingsMenu()
+        settingsButton.showsMenuAsPrimaryAction = true // Automatically show menu on tap
+        view.addSubview(settingsButton)
 
         NSLayoutConstraint.activate([
-            buttonStackView.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 16),
-            buttonStackView.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -16),
-            buttonStackView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: -20)
+            settingsButton.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+            settingsButton.topAnchor.constraint(equalTo: uploadedImageView.bottomAnchor, constant: 20),
+            settingsButton.heightAnchor.constraint(equalToConstant: 44)
         ])
+    }
+
+    private func createSettingsMenu() -> UIMenu {
+        // Create menu actions
+        let uploadImageAction = UIAction(title: "Upload Image", image: UIImage(systemName: "photo")) { _ in
+            self.uploadImageTapped()
+        }
+
+        let changeJointColorAction = UIAction(title: "Change Joint Color", image: UIImage(systemName: "paintbrush")) { _ in
+            self.changeJointColorTapped()
+        }
+
+        let changeLimbColorAction = UIAction(title: "Change Limb Color", image: UIImage(systemName: "paintbrush.fill")) { _ in
+            self.changeLimbColorTapped()
+        }
+
+        // Return menu
+        return UIMenu(title: "Settings", children: [uploadImageAction, changeJointColorAction, changeLimbColorAction])
     }
 
     @objc private func uploadImageTapped() {
@@ -94,17 +99,17 @@ class LogClimbViewController: UIViewController, UIImagePickerControllerDelegate,
         let colorPicker = UIColorPickerViewController()
         colorPicker.delegate = self
         colorPicker.title = type == .joints ? "Select Joint Color" : "Select Limb Color"
-        colorPicker.view.tag = type.rawValue // Use view tag to identify which component to update
+        colorPicker.view.tag = type.rawValue
         present(colorPicker, animated: true)
     }
 
     // Handle the selected image
-    func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [UIImagePickerController.InfoKey : Any]) {
+    func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [UIImagePickerController.InfoKey: Any]) {
         picker.dismiss(animated: true)
 
         if let image = info[.originalImage] as? UIImage {
             uploadedImageView.image = image
-            stickFigureView.isHidden = false // Show stick figure when an image is uploaded
+            stickFigureView.isHidden = false
         }
     }
 
@@ -124,3 +129,5 @@ enum StickFigureComponent: Int {
     case joints = 0
     case limbs = 1
 }
+
+

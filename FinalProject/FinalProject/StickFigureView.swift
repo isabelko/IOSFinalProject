@@ -10,6 +10,7 @@ import Foundation
 import UIKit
 
 class StickFigureView: UIView {
+     
     private var joints: [UIView] = [] // Views for the stick figure's joints
     private var lines: [CAShapeLayer] = [] // Lines connecting the joints
     private var jointToLines: [UIView: [CAShapeLayer]] = [:] // Map each joint to its connected lines
@@ -38,19 +39,23 @@ class StickFigureView: UIView {
     }
 
     private func setupStickFigure() {
+        
+        let screenWidth = UIScreen.main.bounds.width
+        let screenHeight = UIScreen.main.bounds.height
+
         // Define joint positions: [Head, Neck, Left Elbow, Left Hand, Right Elbow, Right Hand, Torso, Left Knee, Left Foot, Right Knee, Right Foot]
         let jointPositions: [CGPoint] = [
-            CGPoint(x: 100, y: 100),  // Head
-            CGPoint(x: 100, y: 150),  // Neck
-            CGPoint(x: 80, y: 175),   // Left elbow
-            CGPoint(x: 60, y: 200),   // Left hand (add emoji)
-            CGPoint(x: 120, y: 175),  // Right elbow
-            CGPoint(x: 140, y: 200),  // Right hand (add emoji)
-            CGPoint(x: 100, y: 250),  // Torso
-            CGPoint(x: 90, y: 275),   // Left knee
-            CGPoint(x: 80, y: 300),   // Left foot (add emoji)
-            CGPoint(x: 110, y: 275),  // Right knee
-            CGPoint(x: 120, y: 300)   // Right foot (add emoji)
+            CGPoint(x: screenWidth / 2, y: screenHeight * 0.1),   // Head (centered horizontally, 10% down from top)
+            CGPoint(x: screenWidth / 2, y: screenHeight * 0.15),  // Neck (centered horizontally, 15% down)
+            CGPoint(x: screenWidth * 0.4, y: screenHeight * 0.2), // Left elbow (40% across, 20% down)
+            CGPoint(x: screenWidth * 0.3, y: screenHeight * 0.25), // Left hand (30% across, 25% down)
+            CGPoint(x: screenWidth * 0.6, y: screenHeight * 0.2), // Right elbow (60% across, 20% down)
+            CGPoint(x: screenWidth * 0.7, y: screenHeight * 0.25), // Right hand (70% across, 25% down)
+            CGPoint(x: screenWidth / 2, y: screenHeight * 0.35),  // Torso (centered horizontally, 35% down)
+            CGPoint(x: screenWidth * 0.45, y: screenHeight * 0.5), // Left knee (45% across, 50% down)
+            CGPoint(x: screenWidth * 0.4, y: screenHeight * 0.6),  // Left foot (40% across, 60% down)
+            CGPoint(x: screenWidth * 0.55, y: screenHeight * 0.5), // Right knee (55% across, 50% down)
+            CGPoint(x: screenWidth * 0.6, y: screenHeight * 0.6)   // Right foot (60% across, 60% down)
         ]
 
         // Define emojis for hands and feet
@@ -90,33 +95,33 @@ class StickFigureView: UIView {
 
 
     private func createJoint(at position: CGPoint, emoji: String? = nil) -> UIView {
-        let jointSize: CGFloat = 15 // Size of the joints
+        let jointSize: CGFloat = 15
         let joint: UIView
 
         if let emoji = emoji {
             // Create a UILabel for emoji-based joints
-            let padding: CGFloat = 5 // Add some extra space around the emoji
-            let label = UILabel(frame: CGRect(x: position.x - (jointSize + padding) / 2,
-                                              y: position.y - (jointSize + padding) / 2,
-                                              width: jointSize + padding,
-                                              height: jointSize + padding))
+            let label = UILabel(frame: CGRect(x: position.x - jointSize / 2, y: position.y - jointSize / 2, width: jointSize, height: jointSize))
             label.text = emoji
-            label.font = .systemFont(ofSize: jointSize) // Keep font size smaller than the frame
+            label.font = .systemFont(ofSize: jointSize)
             label.textAlignment = .center
-            label.isUserInteractionEnabled = true // Enable gesture interaction
+            label.isUserInteractionEnabled = true
             joint = label
         } else {
             // Create a default circular joint
-            joint = UIView(frame: CGRect(x: position.x - jointSize / 4, y: position.y - jointSize / 4, width: jointSize, height: jointSize))
+            joint = UIView(frame: CGRect(x: position.x - jointSize / 2, y: position.y - jointSize / 2, width: jointSize, height: jointSize))
             joint.backgroundColor = jointColor
-            joint.layer.cornerRadius = jointSize / 2 // Circular shape
+            joint.layer.cornerRadius = jointSize / 2
         }
 
-        // Add the pan gesture recognizer to the joint
         joint.addGestureRecognizer(UIPanGestureRecognizer(target: self, action: #selector(handlePan(_:))))
-        jointToLines[joint] = [] // Initialize an empty array for connected lines
+        jointToLines[joint] = [] // Initialize the connected lines array
+
+        // Update all lines after joint creation
+        updateAllLines()
+
         return joint
     }
+
 
 
 
@@ -135,11 +140,16 @@ class StickFigureView: UIView {
     }
 
     private func updateLine(from: UIView, to: UIView, line: CAShapeLayer) {
-        let path = UIBezierPath() // Core graphic from ui kit used to draw lines, curves, etc
-        path.move(to: convert(from.center, from: from.superview))
-        path.addLine(to: convert(to.center, from: to.superview))
+        let fromPosition = convert(from.center, from: from.superview)
+        let toPosition = convert(to.center, from: to.superview)
+        
+        // Create a new path for the line
+        let path = UIBezierPath()
+        path.move(to: fromPosition)
+        path.addLine(to: toPosition)
         line.path = path.cgPath
     }
+
 
     private func updateJointColors() {
         for joint in joints {
@@ -164,7 +174,7 @@ class StickFigureView: UIView {
         // Calculate the new center
         var newCenter = CGPoint(x: joint.center.x + translation.x, y: joint.center.y + translation.y)
         
-        // Defines bounds of where sticky boy can move
+        // Restrict movement to bounds
         let jointRadius: CGFloat = joint.bounds.width / 2
         let allowedArea = CGRect(
             x: 0,
@@ -173,7 +183,6 @@ class StickFigureView: UIView {
             height: bounds.height
         )
         
-        // Restrict movement of sticky boy to those bounds
         newCenter.x = max(allowedArea.minX + jointRadius, min(newCenter.x, allowedArea.maxX - jointRadius))
         newCenter.y = max(allowedArea.minY + jointRadius, min(newCenter.y, allowedArea.maxY - jointRadius))
         
@@ -191,44 +200,18 @@ class StickFigureView: UIView {
         }
     }
     
-    
-//    func saveState(withImage image: UIImage?) -> StickFigureState {
-//        let jointPositions = joints.map { $0.center } // Get the positions of all joints
-//        let imageData = image?.pngData() // Convert the image to Data
-//        return StickFigureState(joints: jointPositions, imageData: imageData)
-//    }
-//    
-//    func loadState(_ state: StickFigureState) {
-//        // Restore joint positions
-//        for (index, position) in state.joints.enumerated() {
-//            guard index < joints.count else { break }
-//            joints[index].center = position
-//        }
-//
-//        // Update lines connecting the joints
-//        for (index, joint) in joints.enumerated() {
-//            if let connectedLines = jointToLines[joint] {
-//                for line in connectedLines {
-//                    if let startJoint = joints.first(where: { jointToLines[$0]?.contains(line) == true && $0 != joint }) {
-//                        updateLine(from: startJoint, to: joint, line: line)
-//                    }
-//                }
-//            }
-//        }
-//    }
-//
-//
-//}
-//
-//struct StickFigureState: Codable {
-//    let joints: [CGPoint]
-//    let imageData: Data? // Store image as Data
-//
-//    // Computed property to retrieve the UIImage from Data
-//    var image: UIImage? {
-//        guard let imageData = imageData else { return nil }
-//        return UIImage(data: imageData)
-//    }
+    private func updateAllLines() {
+        for (joint, lines) in jointToLines {
+            for line in lines {
+                if let otherJoint = joints.first(where: { jointToLines[$0]?.contains(line) == true && $0 != joint }) {
+                    updateLine(from: joint, to: otherJoint, line: line)
+                }
+            }
+        }
+    }
+
+
 }
+
 
 

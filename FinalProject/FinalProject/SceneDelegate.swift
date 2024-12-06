@@ -22,7 +22,7 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
             createNavController(for: SettingsViewController(), title: "Settings", imageName: "gear")
         ]
 
-        // Add a pan gesture recognizer
+        // Add a pan gesture recognizer bc i didnt like how it was swiping. too short of a aswipe
         let panGesture = UIPanGestureRecognizer(target: self, action: #selector(handlePanGesture(_:)))
         tabBarController.view.addGestureRecognizer(panGesture)
 
@@ -50,7 +50,7 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         let translation = gesture.translation(in: gesture.view)
 
         // Check for a horizontal swipe to the left with a sufficient distance
-        if gesture.state == .ended && translation.x < -200 { // Adjust -200 for larger swipes
+        if gesture.state == .ended && translation.x < -200 { // Change for larger swipes or smaller
             guard let tabBarController = window?.rootViewController as? UITabBarController else { return }
 
             // Find the index of the "Log Climb" tab
