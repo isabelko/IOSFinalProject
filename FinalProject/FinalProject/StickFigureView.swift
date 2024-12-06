@@ -95,14 +95,14 @@ class StickFigureView: UIView {
 
 
     private func createJoint(at position: CGPoint, emoji: String? = nil) -> UIView {
-        let jointSize: CGFloat = 15
+        let jointSize: CGFloat = 25 // Increased size to fit emojis better
         let joint: UIView
 
         if let emoji = emoji {
             // Create a UILabel for emoji-based joints
             let label = UILabel(frame: CGRect(x: position.x - jointSize / 2, y: position.y - jointSize / 2, width: jointSize, height: jointSize))
             label.text = emoji
-            label.font = .systemFont(ofSize: jointSize)
+            label.font = .systemFont(ofSize: jointSize - 5) // Ensure the font size fits within the label
             label.textAlignment = .center
             label.isUserInteractionEnabled = true
             joint = label
@@ -116,14 +116,8 @@ class StickFigureView: UIView {
         joint.addGestureRecognizer(UIPanGestureRecognizer(target: self, action: #selector(handlePan(_:))))
         jointToLines[joint] = [] // Initialize the connected lines array
 
-        // Update all lines after joint creation
-        updateAllLines()
-
         return joint
     }
-
-
-
 
     private func connectJoints(from: UIView, to: UIView) {
         let line = CAShapeLayer() // Allows me to use UIbezierpath later for drawing and updating the line
