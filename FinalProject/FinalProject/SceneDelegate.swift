@@ -17,21 +17,23 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         let tabBarController = UITabBarController()
         tabBarController.viewControllers = [
             createViewController(for: MainViewController(), title: "News", imageName: "newspaper"),
-            createViewController(for: ViewClimbsViewController(), title: "View Climbs", imageName: "list.bullet"),
+            createNavController(for: ViewClimbsViewController(), title: "View Climbs", imageName: "list.bullet"),
             createViewController(for: LogClimbViewController(), title: "Log Climb", imageName: "plus"),
             createNavController(for: SettingsViewController(), title: "Settings", imageName: "gear")
         ]
 
-        // Add a pan gesture recognizer bc i didnt like how it was swiping. too short of a aswipe
+        // Add a pan gesture recognizer for custom swipe navigation
         let panGesture = UIPanGestureRecognizer(target: self, action: #selector(handlePanGesture(_:)))
         tabBarController.view.addGestureRecognizer(panGesture)
 
+        // Set up the window with the tab bar controller
         let window = UIWindow(windowScene: windowScene)
         window.rootViewController = tabBarController
         window.makeKeyAndVisible()
         self.window = window
     }
 
+    // Create a navigation controller for tabs that need navigation functionality
     private func createNavController(for rootViewController: UIViewController, title: String, imageName: String) -> UINavigationController {
         let navController = UINavigationController(rootViewController: rootViewController)
         navController.tabBarItem.title = title
@@ -40,18 +42,24 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         return navController
     }
 
+    // Create a standalone view controller for tabs without navigation
     private func createViewController(for viewController: UIViewController, title: String, imageName: String) -> UIViewController {
         viewController.tabBarItem.title = title
         viewController.tabBarItem.image = UIImage(systemName: imageName)
         return viewController
     }
 
+    // Handle the pan gesture for right swipe navigation
     @objc private func handlePanGesture(_ gesture: UIPanGestureRecognizer) {
-        let translation = gesture.translation(in: gesture.view)
+        guard let tabBarController = window?.rootViewController as? UITabBarController else { return }
 
-        // Check for a horizontal swipe to the left with a sufficient distance
-        if gesture.state == .ended && translation.x < -200 { // Change for larger swipes or smaller
-            guard let tabBarController = window?.rootViewController as? UITabBarController else { return }
+        // Detect the direction and magnitude of the pan gesture
+        let translation = gesture.translation(in: gesture.view)
+        let velocity = gesture.velocity(in: gesture.view)
+
+        // Check for a horizontal **right swipe**
+        if gesture.state == .ended && translation.x > 250 && abs(translation.y) < 50 && velocity.x > 0 {
+            print("Detected a right swipe!") // Debugging log
 
             // Find the index of the "Log Climb" tab
             guard let logClimbIndex = tabBarController.viewControllers?.firstIndex(where: {
@@ -61,12 +69,8 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
                 return
             }
 
+            // Switch to the "Log Climb" tab
             tabBarController.selectedIndex = logClimbIndex
         }
     }
 }
-
-
-
-
-
