@@ -321,7 +321,6 @@ class FolderContentsViewController: UIViewController, UITableViewDelegate, UITab
     }
 }
 
-
 // MARK: - ImageViewController
 class ImageViewController: UIViewController {
     var imagePath: URL!
@@ -332,12 +331,10 @@ class ImageViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         view.backgroundColor = .systemBackground
-        title = imagePath.lastPathComponent
 
         setupImageView()
-        loadImage()
-
         setupNavigationButtons()
+        loadImage()
     }
 
     private func setupImageView() {
@@ -354,14 +351,6 @@ class ImageViewController: UIViewController {
         ])
     }
 
-    private func loadImage() {
-        if let imageData = try? Data(contentsOf: imagePath), let image = UIImage(data: imageData) {
-            imageView.image = image
-        } else {
-            print("Failed to load image at path: \(imagePath.path)")
-        }
-    }
-
     private func setupNavigationButtons() {
         navigationItem.rightBarButtonItems = [
             UIBarButtonItem(title: "Next", style: .plain, target: self, action: #selector(showNextImage)),
@@ -369,18 +358,27 @@ class ImageViewController: UIViewController {
         ]
     }
 
+    private func loadImage() {
+        if let imageData = try? Data(contentsOf: imagePath), let image = UIImage(data: imageData) {
+            imageView.image = image
+            // Update the title with the current image name
+            navigationItem.title = imagePath.lastPathComponent
+        } else {
+            print("Failed to load image at path: \(imagePath.path)")
+        }
+    }
+
     @objc private func showNextImage() {
         guard currentIndex + 1 < imagePaths.count else { return }
         currentIndex += 1
         imagePath = imagePaths[currentIndex]
-        loadImage()
+        loadImage() // Reload the image and update the title
     }
 
     @objc private func showPreviousImage() {
         guard currentIndex - 1 >= 0 else { return }
         currentIndex -= 1
         imagePath = imagePaths[currentIndex]
-        loadImage()
+        loadImage() // Reload the image and update the title
     }
 }
-
