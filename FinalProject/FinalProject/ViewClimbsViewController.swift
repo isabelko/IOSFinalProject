@@ -3,7 +3,8 @@
 //  FinalProject
 //
 //  Created by Isak Sabelko on 12/4/24.
-//
+//import UIKit
+
 import UIKit
 
 // MARK: - ViewClimbsViewController
@@ -18,10 +19,7 @@ class ViewClimbsViewController: UIViewController, UITableViewDelegate, UITableVi
         view.backgroundColor = .systemBackground
         title = "View Climbs"
 
-        // Initialize the UI
         setupUI()
-
-        // Load existing folders
         loadFolders()
     }
 
@@ -154,6 +152,7 @@ class FolderContentsViewController: UIViewController, UITableViewDelegate, UITab
     var folderName: String = ""
     var imagePaths: [URL] = []
     private var tableView: UITableView!
+    private let orderFileName = ".order"
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -184,12 +183,42 @@ class FolderContentsViewController: UIViewController, UITableViewDelegate, UITab
         let fileManager = FileManager.default
         if let documentsPath = fileManager.urls(for: .documentDirectory, in: .userDomainMask).first {
             let folderPath = documentsPath.appendingPathComponent(folderName)
+
             do {
                 let fileURLs = try fileManager.contentsOfDirectory(at: folderPath, includingPropertiesForKeys: nil, options: .skipsHiddenFiles)
                 imagePaths = fileURLs.filter { $0.pathExtension.lowercased() == "png" || $0.pathExtension.lowercased() == "jpg" }
+                applySavedOrder()
                 tableView.reloadData()
             } catch {
                 print("Failed to load images: \(error)")
+            }
+        }
+    }
+
+    private func applySavedOrder() {
+        let fileManager = FileManager.default
+        if let documentsPath = fileManager.urls(for: .documentDirectory, in: .userDomainMask).first {
+            let orderFilePath = documentsPath.appendingPathComponent(folderName).appendingPathComponent(orderFileName)
+            if let orderData = try? Data(contentsOf: orderFilePath),
+               let order = try? JSONDecoder().decode([String].self, from: orderData) {
+                imagePaths.sort {
+                    order.firstIndex(of: $0.lastPathComponent) ?? Int.max < order.firstIndex(of: $1.lastPathComponent) ?? Int.max
+                }
+            }
+        }
+    }
+
+    private func saveOrder() {
+        let fileManager = FileManager.default
+        if let documentsPath = fileManager.urls(for: .documentDirectory, in: .userDomainMask).first {
+            let orderFilePath = documentsPath.appendingPathComponent(folderName).appendingPathComponent(orderFileName)
+            let order = imagePaths.map { $0.lastPathComponent }
+            do {
+                let orderData = try JSONEncoder().encode(order)
+                try orderData.write(to: orderFilePath)
+                print("Order saved: \(order)")
+            } catch {
+                print("Failed to save order: \(error)")
             }
         }
     }
@@ -201,8 +230,61 @@ class FolderContentsViewController: UIViewController, UITableViewDelegate, UITab
 
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "ImageCell", for: indexPath)
-        cell.textLabel?.text = imagePaths[indexPath.row].lastPathComponent
+
+        // Remove any subviews to prevent duplication
+        cell.contentView.subviews.forEach { $0.removeFromSuperview() }
+
+        // Display the image filename
+        let label = UILabel()
+        label.text = imagePaths[indexPath.row].lastPathComponent
+        label.translatesAutoresizingMaskIntoConstraints = false
+        cell.contentView.addSubview(label)
+
+        let moveUpButton = UIButton(type: .system)
+        moveUpButton.setTitle("↑", for: .normal)
+        moveUpButton.tag = indexPath.row
+        moveUpButton.addTarget(self, action: #selector(moveImageUp(_:)), for: .touchUpInside)
+        moveUpButton.translatesAutoresizingMaskIntoConstraints = false
+        cell.contentView.addSubview(moveUpButton)
+
+        let moveDownButton = UIButton(type: .system)
+        moveDownButton.setTitle("↓", for: .normal)
+        moveDownButton.tag = indexPath.row
+        moveDownButton.addTarget(self, action: #selector(moveImageDown(_:)), for: .touchUpInside)
+        moveDownButton.translatesAutoresizingMaskIntoConstraints = false
+        cell.contentView.addSubview(moveDownButton)
+
+        NSLayoutConstraint.activate([
+            label.leadingAnchor.constraint(equalTo: cell.contentView.leadingAnchor, constant: 10),
+            label.centerYAnchor.constraint(equalTo: cell.contentView.centerYAnchor),
+
+            moveDownButton.trailingAnchor.constraint(equalTo: cell.contentView.trailingAnchor, constant: -10),
+            moveDownButton.centerYAnchor.constraint(equalTo: cell.contentView.centerYAnchor),
+
+            moveUpButton.trailingAnchor.constraint(equalTo: moveDownButton.leadingAnchor, constant: -10),
+            moveUpButton.centerYAnchor.constraint(equalTo: cell.contentView.centerYAnchor)
+        ])
+
         return cell
+    }
+
+    // MARK: - Move Image Functions
+    @objc private func moveImageUp(_ sender: UIButton) {
+        let index = sender.tag
+        guard index > 0 else { return }
+
+        imagePaths.swapAt(index, index - 1)
+        tableView.reloadData()
+        saveOrder()
+    }
+
+    @objc private func moveImageDown(_ sender: UIButton) {
+        let index = sender.tag
+        guard index < imagePaths.count - 1 else { return }
+
+        imagePaths.swapAt(index, index + 1)
+        tableView.reloadData()
+        saveOrder()
     }
 
     func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCell.EditingStyle, forRowAt indexPath: IndexPath) {
@@ -233,13 +315,18 @@ class FolderContentsViewController: UIViewController, UITableViewDelegate, UITab
         let imagePath = imagePaths[indexPath.row]
         let imageViewer = ImageViewController()
         imageViewer.imagePath = imagePath
+        imageViewer.imagePaths = imagePaths
+        imageViewer.currentIndex = indexPath.row
         navigationController?.pushViewController(imageViewer, animated: true)
     }
 }
 
+
 // MARK: - ImageViewController
 class ImageViewController: UIViewController {
     var imagePath: URL!
+    var imagePaths: [URL] = [] // List of images for navigation
+    var currentIndex: Int = 0 // Index of the current image
     private var imageView: UIImageView!
 
     override func viewDidLoad() {
@@ -249,6 +336,8 @@ class ImageViewController: UIViewController {
 
         setupImageView()
         loadImage()
+
+        setupNavigationButtons()
     }
 
     private func setupImageView() {
@@ -272,4 +361,26 @@ class ImageViewController: UIViewController {
             print("Failed to load image at path: \(imagePath.path)")
         }
     }
+
+    private func setupNavigationButtons() {
+        navigationItem.rightBarButtonItems = [
+            UIBarButtonItem(title: "Next", style: .plain, target: self, action: #selector(showNextImage)),
+            UIBarButtonItem(title: "Previous", style: .plain, target: self, action: #selector(showPreviousImage))
+        ]
+    }
+
+    @objc private func showNextImage() {
+        guard currentIndex + 1 < imagePaths.count else { return }
+        currentIndex += 1
+        imagePath = imagePaths[currentIndex]
+        loadImage()
+    }
+
+    @objc private func showPreviousImage() {
+        guard currentIndex - 1 >= 0 else { return }
+        currentIndex -= 1
+        imagePath = imagePaths[currentIndex]
+        loadImage()
+    }
 }
+
