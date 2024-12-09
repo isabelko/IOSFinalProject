@@ -14,38 +14,38 @@ class SettingsViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         view.backgroundColor = .systemBackground
+        title = "Settings"
 
-        // Add a button for the test setting just to show myself that it is a uinavcontroller
-        let testSettingButton = UIButton(type: .system)
-        testSettingButton.setTitle("Test Setting", for: .normal)
-        testSettingButton.addTarget(self, action: #selector(openTestSetting), for: .touchUpInside)
+        // Add a switch for enabling/disabling news
+        let disableNewsSwitch = UISwitch()
+        disableNewsSwitch.isOn = !UserDefaults.standard.bool(forKey: "disableNews") // Default is news enabled
+        disableNewsSwitch.addTarget(self, action: #selector(toggleNews(_:)), for: .valueChanged)
 
-        view.addSubview(testSettingButton)
-        testSettingButton.translatesAutoresizingMaskIntoConstraints = false
+
+        let disableNewsLabel = UILabel()
+        disableNewsLabel.text = "Enable News"
+        disableNewsLabel.font = .systemFont(ofSize: 16)
+        disableNewsLabel.translatesAutoresizingMaskIntoConstraints = false
+
+        view.addSubview(disableNewsLabel)
+        view.addSubview(disableNewsSwitch)
+        disableNewsSwitch.translatesAutoresizingMaskIntoConstraints = false
+
+        // Layout constraints for disable news switch and label
         NSLayoutConstraint.activate([
-            testSettingButton.centerXAnchor.constraint(equalTo: view.centerXAnchor),
-            testSettingButton.centerYAnchor.constraint(equalTo: view.centerYAnchor)
+            disableNewsLabel.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 20),
+            disableNewsLabel.centerYAnchor.constraint(equalTo: view.centerYAnchor),
+
+            disableNewsSwitch.centerYAnchor.constraint(equalTo: disableNewsLabel.centerYAnchor),
+            disableNewsSwitch.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -20)
         ])
     }
 
-    @objc private func openTestSetting() {
-        let testSettingVC = UIViewController()
-        testSettingVC.view.backgroundColor = .systemGray6
-        testSettingVC.title = "Test Setting Screen"
+    @objc private func toggleNews(_ sender: UISwitch) {
+        let isDisabled = !sender.isOn
+        UserDefaults.standard.set(isDisabled, forKey: "disableNews")
 
-        let label = UILabel()
-        label.text = "This is a test setting screen."
-        label.font = .systemFont(ofSize: 18, weight: .medium)
-        label.textAlignment = .center
-        label.translatesAutoresizingMaskIntoConstraints = false
-
-        testSettingVC.view.addSubview(label)
-        NSLayoutConstraint.activate([
-            label.centerXAnchor.constraint(equalTo: testSettingVC.view.centerXAnchor),
-            label.centerYAnchor.constraint(equalTo: testSettingVC.view.centerYAnchor)
-        ])
-
-        // Push the test setting screen onto top of stack! :) yay
-        navigationController?.pushViewController(testSettingVC, animated: true)
+        // Notify MainNewsViewController about the change
+        NotificationCenter.default.post(name: Notification.Name("NewsVisibilityChanged"), object: nil)
     }
 }

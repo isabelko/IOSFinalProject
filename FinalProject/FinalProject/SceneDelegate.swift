@@ -20,7 +20,7 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
             createViewController(for: MainNewsViewController(), title: "News", imageName: "newspaper"),
             createNavController(for: ViewClimbsViewController(), title: "View Climbs", imageName: "list.bullet"),
             createViewController(for: LogClimbViewController(), title: "Log Climb", imageName: "plus"),
-            createNavController(for: SettingsViewController(), title: "Settings", imageName: "gear")
+            createViewController(for: SettingsViewController(), title: "Settings", imageName: "gear")
         ]
 
         //set up pan gesture so right swipe is larger, ui gesture was too small

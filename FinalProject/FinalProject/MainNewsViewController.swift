@@ -6,16 +6,15 @@
 //
 
 import UIKit
-import SwiftSoup //used to scrape outsiders website for news stories
+import SwiftSoup //used to scrape outsiders website for top stories
 
 //opens first to news
 class MainNewsViewController: UIViewController, UITableViewDataSource, UITableViewDelegate {
     private var featuredStory: (title: String, url: String, images: [String])?
     private var news: [(title: String, url: String, images: [String])] = []
     private let tableView = UITableView()
-    
-    
-    //title on top
+    private let disableMessageLabel = UILabel() //message displayed when news is disabled
+
     private let titleLabel: UILabel = {
         let label = UILabel()
         label.text = "Climbing News"
@@ -25,30 +24,35 @@ class MainNewsViewController: UIViewController, UITableViewDataSource, UITableVi
         return label
     }()
     
-
     override func viewDidLoad() {
         super.viewDidLoad()
         view.backgroundColor = .systemBackground
         title = "Climbing News"
 
-        //set up tabbar looks
+        //observe changes to the "disable news" setting
+        NotificationCenter.default.addObserver(self, selector: #selector(updateNewsVisibility), name: Notification.Name("NewsVisibilityChanged"), object: nil)
+
+        //set up tab bar looks
         tabBarController?.tabBar.isTranslucent = false
         tabBarController?.tabBar.barTintColor = .white
         
         setupTitleLabel()
         setupTableView()
-        fetchNews()
+        setupDisableMessageLabel()
+        updateNewsVisibility() //check initial setting of news visibility
     }
 
-    //setup title
+    deinit {
+        NotificationCenter.default.removeObserver(self, name: Notification.Name("NewsVisibilityChanged"), object: nil)
+    }
+
     private func setupTitleLabel() {
         view.addSubview(titleLabel)
-        
         NSLayoutConstraint.activate([
             titleLabel.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 10),
             titleLabel.leadingAnchor.constraint(equalTo: view.leadingAnchor),
             titleLabel.trailingAnchor.constraint(equalTo: view.trailingAnchor),
-            titleLabel.heightAnchor.constraint(equalToConstant: 40)  // Adjust height as needed
+            titleLabel.heightAnchor.constraint(equalToConstant: 40)
         ])
     }
 
@@ -63,14 +67,29 @@ class MainNewsViewController: UIViewController, UITableViewDataSource, UITableVi
         ])
 
         tableView.contentInset = UIEdgeInsets(top: 0, left: 0, bottom: tabBarController?.tabBar.frame.height ?? 0, right: 0)
-        
         tableView.dataSource = self
         tableView.delegate = self
         tableView.register(FeaturedNewsCell.self, forCellReuseIdentifier: FeaturedNewsCell.identifier)
         tableView.register(NewsCell.self, forCellReuseIdentifier: NewsCell.identifier)
     }
 
-    //function for fetching news to then display
+    //setup the disable message label
+    private func setupDisableMessageLabel() {
+        disableMessageLabel.text = "News is disabled. Enable it in settings."
+        disableMessageLabel.textColor = .gray
+        disableMessageLabel.font = .systemFont(ofSize: 16)
+        disableMessageLabel.textAlignment = .center
+        disableMessageLabel.isHidden = true
+        disableMessageLabel.translatesAutoresizingMaskIntoConstraints = false
+
+        view.addSubview(disableMessageLabel)
+        NSLayoutConstraint.activate([
+            disableMessageLabel.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+            disableMessageLabel.centerYAnchor.constraint(equalTo: view.centerYAnchor)
+        ])
+    }
+
+    //fetch news from the website and update the table view
     private func fetchNews() {
         guard let url = URL(string: "https://www.outsideonline.com/climbing/") else { return }
 
@@ -106,7 +125,7 @@ class MainNewsViewController: UIViewController, UITableViewDataSource, UITableVi
                                 url.starts(with: "http") ? url : "https://www.outsideonline.com\(url)"
                             }
 
-                            //first article on website and set it as featured news
+                            //first article is the featured and top story
                             if index == 0 {
                                 self.featuredStory = (title: title, url: completeURL, images: fullImageUrls)
                             } else {
@@ -131,55 +150,51 @@ class MainNewsViewController: UIViewController, UITableViewDataSource, UITableVi
         task.resume()
     }
 
+    //update news visibility based on the setting toggle
+    @objc private func updateNewsVisibility() {
+        let isNewsDisabled = UserDefaults.standard.bool(forKey: "disableNews")
+        tableView.isHidden = isNewsDisabled
+        disableMessageLabel.isHidden = !isNewsDisabled
+
+        if !isNewsDisabled {
+            fetchNews()
+        }
+    }
+
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         return news.isEmpty ? 0 : news.count + (featuredStory != nil ? 1 : 0)
     }
 
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         if let featuredStory = featuredStory, indexPath.row == 0 {
-            //first set up featured story at top
             let cell = tableView.dequeueReusableCell(withIdentifier: FeaturedNewsCell.identifier, for: indexPath) as! FeaturedNewsCell
             cell.configure(with: featuredStory.title, imageURL: featuredStory.images.first ?? "")
             return cell
         } else {
-            //then do the other stories
             let adjustedIndex = indexPath.row - (featuredStory != nil ? 1 : 0)
-
-            //check for errors
             guard adjustedIndex < news.count else {
-                print("Index out of range when creating cell for row: \(indexPath.row)")
-                return UITableViewCell() // Return an empty cell to avoid a crash
+                return UITableViewCell()
             }
-
-            //now display other storeis that arent featured
             let cell = tableView.dequeueReusableCell(withIdentifier: NewsCell.identifier, for: indexPath) as! NewsCell
             let article = news[adjustedIndex]
-            cell.isFeatured = false //decide if featured
-            cell.configure(with: article.title, imageURL: "") //no image for non featured
+            cell.isFeatured = false
+            cell.configure(with: article.title, imageURL: "")
             return cell
         }
     }
 
-    //UITableViewDelegate Method
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         tableView.deselectRow(at: indexPath, animated: true)
-        
-        //check for featured story
+
         if indexPath.row == 0, let firstStory = featuredStory {
-            //put in first cell on top
             if let url = URL(string: firstStory.url) {
                 UIApplication.shared.open(url)
             }
         } else {
-            //rest is non featured
             let adjustedIndex = indexPath.row - (featuredStory != nil ? 1 : 0)
-            
-            //make sure valid index
             guard adjustedIndex < news.count else {
-                print("Index out of range")
                 return
             }
-            
             let article = news[adjustedIndex]
             if let url = URL(string: article.url) {
                 UIApplication.shared.open(url)
@@ -187,4 +202,3 @@ class MainNewsViewController: UIViewController, UITableViewDataSource, UITableVi
         }
     }
 }
-
