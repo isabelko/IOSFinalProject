@@ -1,0 +1,44 @@
+****************************
+* Overall Explination      *
+****************************
+-Climbing News
+    -This is the first view that is loaded
+    -Used swiftsoup to scrape url and news titles from climbing news website
+    -The first story is considered the featured story and is displayed larger at
+     the top of the screen with an image while the other stories are normal
+     stories and are displayed below it in a table
+    -Clicking on story will take you to the url on safari and leave climbing app
+-View Climbs
+    -View climbs allows users to view the folders of different climbs
+    -Within each folder contains the images of each step within a climb
+    -Must create folder before saving a climb using log climb tab
+    -Can delete folder or image with a left swipe
+    -can reorganize images within folder to then have a slideshow in order when
+     clicking into image
+-Log Climb
+    -Can be shortcut to by swiping left anywhere in the app
+    -Upload image to the log climb screen by using setting at bottom middle
+    -Once uploading image you can move the stick figure to the desired
+     position on the image
+    -Can also change the color of the limbs or the joints within the settings
+     at the bottom
+    -Once done with climb, click the settings at bottom middle then decide a
+     name for the image and then select folder to save it in
+    -Saving is done by screenshotting the screen and saving it as a png
+-Settings
+    
+    
+    
+-Struggles
+
+
+
+-Proudest Moments :)
+
+
+
+
+-Plans for Future
+    
+
+
