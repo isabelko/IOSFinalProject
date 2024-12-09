@@ -3,11 +3,10 @@
 //  FinalProject
 //
 //  Created by Isak Sabelko on 12/4/24.
-//import UIKit
 
 import UIKit
 
-// MARK: - ViewClimbsViewController
+//class for viewing climbs, within nav tab, nav controller with table
 class ViewClimbsViewController: UIViewController, UITableViewDelegate, UITableViewDataSource {
 
     var tableView: UITableView!
@@ -56,7 +55,8 @@ class ViewClimbsViewController: UIViewController, UITableViewDelegate, UITableVi
     @objc private func newFolderButtonTapped() {
         showNewFolderAlert()
     }
-
+    
+    //create folder for new climbs
     func createFolder(named folderName: String) {
         let fileManager = FileManager.default
         if let documentsPath = fileManager.urls(for: .documentDirectory, in: .userDomainMask).first {
@@ -70,7 +70,8 @@ class ViewClimbsViewController: UIViewController, UITableViewDelegate, UITableVi
             }
         }
     }
-
+    
+    //update to show
     func showNewFolderAlert() {
         let alert = UIAlertController(title: "New Folder", message: "Enter folder name", preferredStyle: .alert)
         alert.addTextField { textField in
@@ -86,7 +87,8 @@ class ViewClimbsViewController: UIViewController, UITableViewDelegate, UITableVi
         alert.addAction(cancelAction)
         present(alert, animated: true)
     }
-
+    
+    //load new folders or old
     func loadFolders() {
         let fileManager = FileManager.default
         if let documentsPath = fileManager.urls(for: .documentDirectory, in: .userDomainMask).first {
@@ -100,7 +102,6 @@ class ViewClimbsViewController: UIViewController, UITableViewDelegate, UITableVi
         }
     }
 
-    // MARK: - UITableViewDataSource
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         return folderNames.count
     }
@@ -122,7 +123,8 @@ class ViewClimbsViewController: UIViewController, UITableViewDelegate, UITableVi
             }
         }
     }
-
+    
+    //allow folder deletion
     private func deleteFolder(named folderName: String, completion: (Bool) -> Void) {
         let fileManager = FileManager.default
         if let documentsPath = fileManager.urls(for: .documentDirectory, in: .userDomainMask).first {
@@ -137,7 +139,6 @@ class ViewClimbsViewController: UIViewController, UITableViewDelegate, UITableVi
         }
     }
 
-    // MARK: - UITableViewDelegate
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         let folderName = folderNames[indexPath.row]
         let folderContentsVC = FolderContentsViewController()
@@ -146,7 +147,8 @@ class ViewClimbsViewController: UIViewController, UITableViewDelegate, UITableVi
     }
 }
 
-// MARK: - FolderContentsViewController
+//ik this should be in a seperate file but it has to do with viewclimbs so I like it here sorry
+//view for when in a folder, table view
 class FolderContentsViewController: UIViewController, UITableViewDelegate, UITableViewDataSource {
 
     var folderName: String = ""
@@ -195,6 +197,7 @@ class FolderContentsViewController: UIViewController, UITableViewDelegate, UITab
         }
     }
 
+    //allow for organizing image order
     private func applySavedOrder() {
         let fileManager = FileManager.default
         if let documentsPath = fileManager.urls(for: .documentDirectory, in: .userDomainMask).first {
@@ -223,7 +226,6 @@ class FolderContentsViewController: UIViewController, UITableViewDelegate, UITab
         }
     }
 
-    // MARK: - UITableViewDataSource
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         return imagePaths.count
     }
@@ -231,10 +233,9 @@ class FolderContentsViewController: UIViewController, UITableViewDelegate, UITab
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "ImageCell", for: indexPath)
 
-        // Remove any subviews to prevent duplication
         cell.contentView.subviews.forEach { $0.removeFromSuperview() }
 
-        // Display the image filename
+        //display the image filename
         let label = UILabel()
         label.text = imagePaths[indexPath.row].lastPathComponent
         label.translatesAutoresizingMaskIntoConstraints = false
@@ -268,7 +269,7 @@ class FolderContentsViewController: UIViewController, UITableViewDelegate, UITab
         return cell
     }
 
-    // MARK: - Move Image Functions
+    //button and moving image around in folder
     @objc private func moveImageUp(_ sender: UIButton) {
         let index = sender.tag
         guard index > 0 else { return }
@@ -310,7 +311,6 @@ class FolderContentsViewController: UIViewController, UITableViewDelegate, UITab
         }
     }
 
-    // MARK: - UITableViewDelegate
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         let imagePath = imagePaths[indexPath.row]
         let imageViewer = ImageViewController()
@@ -321,11 +321,12 @@ class FolderContentsViewController: UIViewController, UITableViewDelegate, UITab
     }
 }
 
-// MARK: - ImageViewController
+//again should be seperate file but used withing folder within image selection, shows the image clicked on and allows navigation to next
+//image in order set by user
 class ImageViewController: UIViewController {
     var imagePath: URL!
-    var imagePaths: [URL] = [] // List of images for navigation
-    var currentIndex: Int = 0 // Index of the current image
+    var imagePaths: [URL] = [] //list of images for navigation within folder
+    var currentIndex: Int = 0 //index of the current image within folder
     private var imageView: UIImageView!
 
     override func viewDidLoad() {
@@ -358,27 +359,29 @@ class ImageViewController: UIViewController {
         ]
     }
 
+    //loading image
     private func loadImage() {
         if let imageData = try? Data(contentsOf: imagePath), let image = UIImage(data: imageData) {
             imageView.image = image
-            // Update the title with the current image name
             navigationItem.title = imagePath.lastPathComponent
         } else {
             print("Failed to load image at path: \(imagePath.path)")
         }
     }
 
+    //move between images
     @objc private func showNextImage() {
         guard currentIndex + 1 < imagePaths.count else { return }
         currentIndex += 1
         imagePath = imagePaths[currentIndex]
-        loadImage() // Reload the image and update the title
+        loadImage()
     }
-
+    
+    //move between images
     @objc private func showPreviousImage() {
         guard currentIndex - 1 >= 0 else { return }
         currentIndex -= 1
         imagePath = imagePaths[currentIndex]
-        loadImage() // Reload the image and update the title
+        loadImage()
     }
 }

@@ -14,26 +14,26 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
     func scene(_ scene: UIScene, willConnectTo session: UISceneSession, options connectionOptions: UIScene.ConnectionOptions) {
         guard let windowScene = (scene as? UIWindowScene) else { return }
 
+        //setup tabbarcontroller for the main screen
         let tabBarController = UITabBarController()
         tabBarController.viewControllers = [
-            createViewController(for: MainViewController(), title: "News", imageName: "newspaper"),
+            createViewController(for: MainNewsViewController(), title: "News", imageName: "newspaper"),
             createNavController(for: ViewClimbsViewController(), title: "View Climbs", imageName: "list.bullet"),
             createViewController(for: LogClimbViewController(), title: "Log Climb", imageName: "plus"),
             createNavController(for: SettingsViewController(), title: "Settings", imageName: "gear")
         ]
 
-        // Add a pan gesture recognizer for custom swipe navigation
+        //set up pan gesture so right swipe is larger, ui gesture was too small
         let panGesture = UIPanGestureRecognizer(target: self, action: #selector(handlePanGesture(_:)))
         tabBarController.view.addGestureRecognizer(panGesture)
 
-        // Set up the window with the tab bar controller
         let window = UIWindow(windowScene: windowScene)
         window.rootViewController = tabBarController
         window.makeKeyAndVisible()
         self.window = window
     }
 
-    // Create a navigation controller for tabs that need navigation functionality
+    //nav controller
     private func createNavController(for rootViewController: UIViewController, title: String, imageName: String) -> UINavigationController {
         let navController = UINavigationController(rootViewController: rootViewController)
         navController.tabBarItem.title = title
@@ -42,26 +42,26 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         return navController
     }
 
-    // Create a standalone view controller for tabs without navigation
+    //views without nav controller
     private func createViewController(for viewController: UIViewController, title: String, imageName: String) -> UIViewController {
         viewController.tabBarItem.title = title
         viewController.tabBarItem.image = UIImage(systemName: imageName)
         return viewController
     }
 
-    // Handle the pan gesture for right swipe navigation
+    //set up functionalitt of right swipe
     @objc private func handlePanGesture(_ gesture: UIPanGestureRecognizer) {
         guard let tabBarController = window?.rootViewController as? UITabBarController else { return }
 
-        // Detect the direction and magnitude of the pan gesture
+        //speed and direction
         let translation = gesture.translation(in: gesture.view)
         let velocity = gesture.velocity(in: gesture.view)
 
-        // Check for a horizontal **right swipe**
+        //check for right swipe for going to log new climb
         if gesture.state == .ended && translation.x > 250 && abs(translation.y) < 50 && velocity.x > 0 {
-            print("Detected a right swipe!") // Debugging log
+            print("Detected a right swipe!") //quick debug
 
-            // Find the index of the "Log Climb" tab
+            //find log climb
             guard let logClimbIndex = tabBarController.viewControllers?.firstIndex(where: {
                 ($0.tabBarItem.title == "Log Climb")
             }) else {
@@ -69,7 +69,7 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
                 return
             }
 
-            // Switch to the "Log Climb" tab
+            //go to log climb
             tabBarController.selectedIndex = logClimbIndex
         }
     }

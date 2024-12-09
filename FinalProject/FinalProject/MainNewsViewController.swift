@@ -4,19 +4,18 @@
 //
 //  Created by Isak Sabelko on 11/19/24.
 //
-//this has kinda become my main view controller because it is the news view controller for the nav controlelr
-//also opens to here
 
 import UIKit
-import SwiftSoup
+import SwiftSoup //used to scrape outsiders website for news stories
 
-class MainViewController: UIViewController, UITableViewDataSource, UITableViewDelegate {
+//opens first to news
+class MainNewsViewController: UIViewController, UITableViewDataSource, UITableViewDelegate {
     private var featuredStory: (title: String, url: String, images: [String])?
     private var news: [(title: String, url: String, images: [String])] = []
     private let tableView = UITableView()
     
     
-    // Add the title label
+    //title on top
     private let titleLabel: UILabel = {
         let label = UILabel()
         label.text = "Climbing News"
@@ -32,16 +31,16 @@ class MainViewController: UIViewController, UITableViewDataSource, UITableViewDe
         view.backgroundColor = .systemBackground
         title = "Climbing News"
 
-        // Set the tab bar's appearance to solid
+        //set up tabbar looks
         tabBarController?.tabBar.isTranslucent = false
-        tabBarController?.tabBar.barTintColor = .white  // Set a solid color for the tab bar
+        tabBarController?.tabBar.barTintColor = .white
         
-        setupTitleLabel()  // Add the title label setup
+        setupTitleLabel()
         setupTableView()
         fetchNews()
     }
 
-    // Function to setup the title label
+    //setup title
     private func setupTitleLabel() {
         view.addSubview(titleLabel)
         
@@ -57,13 +56,12 @@ class MainViewController: UIViewController, UITableViewDataSource, UITableViewDe
         view.addSubview(tableView)
         tableView.translatesAutoresizingMaskIntoConstraints = false
         NSLayoutConstraint.activate([
-            tableView.topAnchor.constraint(equalTo: titleLabel.bottomAnchor, constant: 10), // Add space below title
+            tableView.topAnchor.constraint(equalTo: titleLabel.bottomAnchor, constant: 10),
             tableView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
             tableView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
-            tableView.bottomAnchor.constraint(equalTo: view.bottomAnchor)  // Ensure it doesn't go behind tab bar
+            tableView.bottomAnchor.constraint(equalTo: view.bottomAnchor)
         ])
 
-        // Adjust content inset to avoid going under the tab bar
         tableView.contentInset = UIEdgeInsets(top: 0, left: 0, bottom: tabBarController?.tabBar.frame.height ?? 0, right: 0)
         
         tableView.dataSource = self
@@ -72,6 +70,7 @@ class MainViewController: UIViewController, UITableViewDataSource, UITableViewDe
         tableView.register(NewsCell.self, forCellReuseIdentifier: NewsCell.identifier)
     }
 
+    //function for fetching news to then display
     private func fetchNews() {
         guard let url = URL(string: "https://www.outsideonline.com/climbing/") else { return }
 
@@ -107,7 +106,7 @@ class MainViewController: UIViewController, UITableViewDataSource, UITableViewDe
                                 url.starts(with: "http") ? url : "https://www.outsideonline.com\(url)"
                             }
 
-                            // Use the first article as the featured story
+                            //first article on website and set it as featured news
                             if index == 0 {
                                 self.featuredStory = (title: title, url: completeURL, images: fullImageUrls)
                             } else {
@@ -138,44 +137,44 @@ class MainViewController: UIViewController, UITableViewDataSource, UITableViewDe
 
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         if let featuredStory = featuredStory, indexPath.row == 0 {
-            // Configure the featured news cell
+            //first set up featured story at top
             let cell = tableView.dequeueReusableCell(withIdentifier: FeaturedNewsCell.identifier, for: indexPath) as! FeaturedNewsCell
             cell.configure(with: featuredStory.title, imageURL: featuredStory.images.first ?? "")
             return cell
         } else {
-            // Adjust the index for the regular news cells (skip the first featured cell)
+            //then do the other stories
             let adjustedIndex = indexPath.row - (featuredStory != nil ? 1 : 0)
 
-            // Ensure the adjusted index is within bounds
+            //check for errors
             guard adjustedIndex < news.count else {
                 print("Index out of range when creating cell for row: \(indexPath.row)")
                 return UITableViewCell() // Return an empty cell to avoid a crash
             }
 
-            // Configure the cell for the regular news article
+            //now display other storeis that arent featured
             let cell = tableView.dequeueReusableCell(withIdentifier: NewsCell.identifier, for: indexPath) as! NewsCell
             let article = news[adjustedIndex]
-            cell.isFeatured = false // Hide the image for non-featured cells
-            cell.configure(with: article.title, imageURL: "") // No image for non-featured articles
+            cell.isFeatured = false //decide if featured
+            cell.configure(with: article.title, imageURL: "") //no image for non featured
             return cell
         }
     }
 
-    // UITableViewDelegate Method
+    //UITableViewDelegate Method
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         tableView.deselectRow(at: indexPath, animated: true)
         
-        // Check if the selected row corresponds to the featured story
+        //check for featured story
         if indexPath.row == 0, let firstStory = featuredStory {
-            // If the first cell (the featured story) is selected, use its URL
+            //put in first cell on top
             if let url = URL(string: firstStory.url) {
                 UIApplication.shared.open(url)
             }
         } else {
-            // Adjust for the offset when selecting a non-featured news cell
+            //rest is non featured
             let adjustedIndex = indexPath.row - (featuredStory != nil ? 1 : 0)
             
-            // Ensure the adjusted index is valid before accessing
+            //make sure valid index
             guard adjustedIndex < news.count else {
                 print("Index out of range")
                 return

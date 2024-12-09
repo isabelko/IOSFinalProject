@@ -9,7 +9,7 @@ import UIKit
 
 class FolderSelectionViewController: UIViewController, UITableViewDelegate, UITableViewDataSource {
     
-    var fetchFolderNames: (() -> [String])? // Function to fetch updated folder names
+    var fetchFolderNames: (() -> [String])?
     var onFolderSelected: ((String) -> Void)?
     
     private var tableView: UITableView!
@@ -25,7 +25,7 @@ class FolderSelectionViewController: UIViewController, UITableViewDelegate, UITa
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
-        refreshFolderNames() // Refresh folder list whenever the view appears
+        refreshFolderNames()
     }
     
     private func setupTableView() {
@@ -52,7 +52,6 @@ class FolderSelectionViewController: UIViewController, UITableViewDelegate, UITa
         }
     }
     
-    // MARK: - UITableViewDataSource Methods
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         return folderNames.count
     }
@@ -63,7 +62,6 @@ class FolderSelectionViewController: UIViewController, UITableViewDelegate, UITa
         return cell
     }
     
-    // MARK: - UITableViewDelegate Methods
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         let selectedFolder = folderNames[indexPath.row]
         onFolderSelected?(selectedFolder)
@@ -87,12 +85,12 @@ class LogClimbViewController: UIViewController, UIImagePickerControllerDelegate,
         super.viewDidLoad()
         view.backgroundColor = .white
 
-        loadFolders() // Load folder names
+        loadFolders()
         setupUI()
     }
 
     private func setupUI() {
-        // Image View for the uploaded image
+        //image below stick figure
         uploadedImageView = UIImageView()
         uploadedImageView.contentMode = .scaleAspectFit
         uploadedImageView.translatesAutoresizingMaskIntoConstraints = false
@@ -105,7 +103,7 @@ class LogClimbViewController: UIViewController, UIImagePickerControllerDelegate,
             uploadedImageView.heightAnchor.constraint(equalTo: view.heightAnchor, multiplier: 0.85)
         ])
 
-        // Stick Figure View overlay
+        //stick figure view on top of image
         stickFigureView = StickFigureView()
         stickFigureView.translatesAutoresizingMaskIntoConstraints = false
         view.addSubview(stickFigureView)
@@ -117,7 +115,7 @@ class LogClimbViewController: UIViewController, UIImagePickerControllerDelegate,
             stickFigureView.bottomAnchor.constraint(equalTo: uploadedImageView.bottomAnchor)
         ])
 
-        // Settings Button with Drop-down Menu
+        //setting button at bottom
         settingsButton = UIButton(type: .system)
         settingsButton.setTitle("Settings", for: .normal)
         settingsButton.translatesAutoresizingMaskIntoConstraints = false
@@ -133,7 +131,7 @@ class LogClimbViewController: UIViewController, UIImagePickerControllerDelegate,
     }
 
     private func createSettingsMenu() -> UIMenu {
-        // Create menu actions
+        //settings menu optioons
         let uploadImageAction = UIAction(title: "Upload Image", image: UIImage(systemName: "photo")) { _ in
             self.uploadImageTapped()
         }
@@ -150,7 +148,6 @@ class LogClimbViewController: UIViewController, UIImagePickerControllerDelegate,
             self.saveClimbTapped()
         }
 
-        // Return menu with the new Save Climb action
         return UIMenu(title: "Settings", children: [uploadImageAction, changeJointColorAction, changeLimbColorAction, saveClimbAction])
     }
 
@@ -195,6 +192,7 @@ class LogClimbViewController: UIViewController, UIImagePickerControllerDelegate,
         present(alert, animated: true)
     }
 
+    //select folder to save image in
     private func showFolderPicker(for screenshot: UIImage, imageName: String) {
         let folderSelectionVC = FolderSelectionViewController()
         folderSelectionVC.fetchFolderNames = { [weak self] in
@@ -208,6 +206,8 @@ class LogClimbViewController: UIViewController, UIImagePickerControllerDelegate,
         present(navigationController, animated: true)
     }
 
+    //i wanted to save the state of stick figure and image to then be able to modify it later but
+    //went with a quick way of just screenshotting the screen and storing it.
     func saveScreenshot(_ image: UIImage, to folderName: String, withName imageName: String) {
         if let documentsPath = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first {
             let folderPath = documentsPath.appendingPathComponent(folderName)
@@ -252,25 +252,7 @@ class LogClimbViewController: UIViewController, UIImagePickerControllerDelegate,
         folderNames = loadFoldersFromFileSystem()
     }
 
-    func saveScreenshot(_ image: UIImage, to folderName: String) {
-        if let documentsPath = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first {
-            let folderPath = documentsPath.appendingPathComponent(folderName)
-            let filePath = folderPath.appendingPathComponent("Climb_\(UUID().uuidString).png")
-
-            do {
-                if !FileManager.default.fileExists(atPath: folderPath.path) {
-                    try FileManager.default.createDirectory(at: folderPath, withIntermediateDirectories: true, attributes: nil)
-                }
-                if let imageData = image.pngData() {
-                    try imageData.write(to: filePath)
-                    print("Screenshot saved at: \(filePath)")
-                }
-            } catch {
-                print("Failed to save screenshot: \(error)")
-            }
-        }
-    }
-
+    //color picker option
     private func showColorPicker(for type: StickFigureComponent) {
         let colorPicker = UIColorPickerViewController()
         colorPicker.delegate = self
@@ -279,7 +261,6 @@ class LogClimbViewController: UIViewController, UIImagePickerControllerDelegate,
         present(colorPicker, animated: true)
     }
 
-    // MARK: - UIPickerView DataSource
     func numberOfComponents(in pickerView: UIPickerView) -> Int {
         return 1
     }
@@ -288,12 +269,11 @@ class LogClimbViewController: UIViewController, UIImagePickerControllerDelegate,
         return folderNames.count
     }
 
-    // MARK: - UIPickerView Delegate
     func pickerView(_ pickerView: UIPickerView, titleForRow row: Int, forComponent component: Int) -> String? {
         return folderNames[row]
     }
 
-    // Handle the selected image
+    //select image for background to put climber on
     func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [UIImagePickerController.InfoKey: Any]) {
         picker.dismiss(animated: true)
 
@@ -303,7 +283,7 @@ class LogClimbViewController: UIViewController, UIImagePickerControllerDelegate,
         }
     }
 
-    // Handle color selection from the color picker
+    //chang ecolor of joiont or limb
     func colorPickerViewControllerDidFinish(_ viewController: UIColorPickerViewController) {
         let selectedColor = viewController.selectedColor
         if viewController.view.tag == StickFigureComponent.joints.rawValue {
@@ -314,7 +294,7 @@ class LogClimbViewController: UIViewController, UIImagePickerControllerDelegate,
     }
 }
 
-// Enum to distinguish between joints and limbs
+//decide if joint or limb
 enum StickFigureComponent: Int {
     case joints = 0
     case limbs = 1

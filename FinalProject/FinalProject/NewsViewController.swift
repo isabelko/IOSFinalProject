@@ -6,7 +6,6 @@
 
 import Foundation
 import UIKit
-import SwiftSoup
 
 class FeaturedNewsCell: UITableViewCell {
     static let identifier = "FeaturedNewsCell"
@@ -47,7 +46,6 @@ class FeaturedNewsCell: UITableViewCell {
     
     override func prepareForReuse() {
         super.prepareForReuse()
-        // Reset the image and text when the cell is reused
         customImageView.image = nil
         titleLabel.text = nil
     }
@@ -67,7 +65,7 @@ class FeaturedNewsCell: UITableViewCell {
     }
 }
 
-// NewsCell
+//table cells
 class NewsCell: UITableViewCell {
     static let identifier = "NewsCell"
     
@@ -76,7 +74,7 @@ class NewsCell: UITableViewCell {
     
     var isFeatured: Bool = false {
         didSet {
-            customImageView.isHidden = !isFeatured  // Hide the image for stories not featured
+            customImageView.isHidden = !isFeatured  //determine if featured
             updateConstraintsForFeatured(isFeatured)
         }
     }
@@ -93,13 +91,9 @@ class NewsCell: UITableViewCell {
         customImageView.clipsToBounds = true
         customImageView.translatesAutoresizingMaskIntoConstraints = false
         contentView.addSubview(customImageView)
-        
-        // Set up initial constraints for when the image is present
-//        updateConstraintsForFeatured(true)
     }
     
     private func updateConstraintsForFeatured(_ isFeatured: Bool) {
-        // Remove previous constraints if they exist
         contentView.removeConstraints(contentView.constraints)
         
         if isFeatured {
@@ -130,13 +124,6 @@ class NewsCell: UITableViewCell {
         fatalError("init(coder:) has not been implemented")
     }
     
-//    override func prepareForReuse() {
-//        super.prepareForReuse()
-//        // Reset the image and text when the cell is reused
-//        customImageView.image = nil
-//        titleLabel.text = nil
-//    }
-    
     func configure(with title: String, imageURL: String) {
         titleLabel.text = title
         
@@ -152,5 +139,4 @@ class NewsCell: UITableViewCell {
     }
 }
 
-// NewsViewController
 

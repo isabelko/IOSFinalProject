@@ -5,15 +5,15 @@
 //  Created by Isak Sabelko on 11/19/24.
 //
 //overlaps on top of the log climb view
-import Foundation
 
+import Foundation
 import UIKit
 
 class StickFigureView: UIView {
      
-    private var joints: [UIView] = [] // Views for the stick figure's joints
-    private var lines: [CAShapeLayer] = [] // Lines connecting the joints
-    private var jointToLines: [UIView: [CAShapeLayer]] = [:] // Map each joint to its connected lines
+    private var joints: [UIView] = [] //views for the stick figure's joints
+    private var lines: [CAShapeLayer] = [] //connect joints with lines
+    private var jointToLines: [UIView: [CAShapeLayer]] = [:] //create a map for each of the joints and lines
 
     var jointColor: UIColor = .red {
         didSet {
@@ -29,7 +29,7 @@ class StickFigureView: UIView {
 
     override init(frame: CGRect) {
         super.init(frame: frame)
-        backgroundColor = .clear // Transparent background
+        backgroundColor = .clear //clear to overlay
         setupStickFigure()
     }
 
@@ -43,90 +43,91 @@ class StickFigureView: UIView {
         let screenWidth = UIScreen.main.bounds.width
         let screenHeight = UIScreen.main.bounds.height
 
-        // Define joint positions: [Head, Neck, Left Elbow, Left Hand, Right Elbow, Right Hand, Torso, Left Knee, Left Foot, Right Knee, Right Foot]
+        //joint positions
         let jointPositions: [CGPoint] = [
-            CGPoint(x: screenWidth / 2, y: screenHeight * 0.1),   // Head (centered horizontally, 10% down from top)
-            CGPoint(x: screenWidth / 2, y: screenHeight * 0.15),  // Neck (centered horizontally, 15% down)
-            CGPoint(x: screenWidth * 0.4, y: screenHeight * 0.2), // Left elbow (40% across, 20% down)
-            CGPoint(x: screenWidth * 0.3, y: screenHeight * 0.25), // Left hand (30% across, 25% down)
-            CGPoint(x: screenWidth * 0.6, y: screenHeight * 0.2), // Right elbow (60% across, 20% down)
-            CGPoint(x: screenWidth * 0.7, y: screenHeight * 0.25), // Right hand (70% across, 25% down)
-            CGPoint(x: screenWidth / 2, y: screenHeight * 0.35),  // Torso (centered horizontally, 35% down)
-            CGPoint(x: screenWidth * 0.45, y: screenHeight * 0.5), // Left knee (45% across, 50% down)
-            CGPoint(x: screenWidth * 0.4, y: screenHeight * 0.6),  // Left foot (40% across, 60% down)
-            CGPoint(x: screenWidth * 0.55, y: screenHeight * 0.5), // Right knee (55% across, 50% down)
-            CGPoint(x: screenWidth * 0.6, y: screenHeight * 0.6)   // Right foot (60% across, 60% down)
+            CGPoint(x: screenWidth / 2, y: screenHeight * 0.1),     //head
+            CGPoint(x: screenWidth / 2, y: screenHeight * 0.15),    //neck
+            CGPoint(x: screenWidth * 0.4, y: screenHeight * 0.2),   //left elbow
+            CGPoint(x: screenWidth * 0.3, y: screenHeight * 0.25),  //left hand
+            CGPoint(x: screenWidth * 0.6, y: screenHeight * 0.2),   //right elbow
+            CGPoint(x: screenWidth * 0.7, y: screenHeight * 0.25),  //right hand
+            CGPoint(x: screenWidth / 2, y: screenHeight * 0.35),    //torso
+            CGPoint(x: screenWidth * 0.45, y: screenHeight * 0.5),  //left knee
+            CGPoint(x: screenWidth * 0.4, y: screenHeight * 0.6),   //left foot
+            CGPoint(x: screenWidth * 0.55, y: screenHeight * 0.5),  //right knee
+            CGPoint(x: screenWidth * 0.6, y: screenHeight * 0.6)    //right foot
         ]
 
-        // Define emojis for hands and feet
+        //define emojis for hands and feet also can change other joints if wanting to
+        //same order as above
         let jointEmojis: [String?] = [
-            "😀",       // Head
-            nil,       // Neck
-            nil,       // Left elbow
-            "🖐️",      // Left hand
-            nil,       // Right elbow
-            "✋",       // Right hand
-            nil,       // Torso
-            nil,       // Left knee
-            "🦶",      // Left foot
-            nil,       // Right knee
-            "🦶"       // Right foot
+            "😀",
+            nil,
+            nil,
+            "🖐️",
+            nil,
+            "✋",
+            nil,
+            nil,
+            "🦶",
+            nil,
+            "🦶"
         ]
 
-        // Create joints
+        //create the joints
         for (index, position) in jointPositions.enumerated() {
             let joint = createJoint(at: position, emoji: jointEmojis[index])
             joints.append(joint)
             addSubview(joint)
         }
 
-        // Connect joints with lines
-        connectJoints(from: joints[0], to: joints[1]) // Head to neck
-        connectJoints(from: joints[1], to: joints[2]) // Neck to left elbow
-        connectJoints(from: joints[2], to: joints[3]) // Left elbow to left hand
-        connectJoints(from: joints[1], to: joints[4]) // Neck to right elbow
-        connectJoints(from: joints[4], to: joints[5]) // Right elbow to right hand
-        connectJoints(from: joints[1], to: joints[6]) // Neck to torso
-        connectJoints(from: joints[6], to: joints[7]) // Torso to left knee
-        connectJoints(from: joints[7], to: joints[8]) // Left knee to left foot
-        connectJoints(from: joints[6], to: joints[9]) // Torso to right knee
-        connectJoints(from: joints[9], to: joints[10]) // Right knee to right foot
+        //connect the joints with lines
+        connectJoints(from: joints[0], to: joints[1])   //head to neck
+        connectJoints(from: joints[1], to: joints[2])   //neck to left elbow
+        connectJoints(from: joints[2], to: joints[3])   //left elbow to left hand
+        connectJoints(from: joints[1], to: joints[4])   //neck to right elbow
+        connectJoints(from: joints[4], to: joints[5])   //right elbow to right hand
+        connectJoints(from: joints[1], to: joints[6])   //neck to torso
+        connectJoints(from: joints[6], to: joints[7])   //torso to left knee
+        connectJoints(from: joints[7], to: joints[8])   //left knee to left foot
+        connectJoints(from: joints[6], to: joints[9])   //torso to right knee
+        connectJoints(from: joints[9], to: joints[10])  //right knee to right foot
     }
 
 
     private func createJoint(at position: CGPoint, emoji: String? = nil) -> UIView {
-        let jointSize: CGFloat = 25 // Increased size to fit emojis better
+        let jointSize: CGFloat = 25 //emojis cutting off so makes size larger to now cut off
         let joint: UIView
 
         if let emoji = emoji {
-            // Create a UILabel for emoji-based joints
+            //UILabel for emoji-based joints
             let label = UILabel(frame: CGRect(x: position.x - jointSize / 2, y: position.y - jointSize / 2, width: jointSize, height: jointSize))
             label.text = emoji
-            label.font = .systemFont(ofSize: jointSize - 5) // Ensure the font size fits within the label
+            label.font = .systemFont(ofSize: jointSize - 5)
             label.textAlignment = .center
             label.isUserInteractionEnabled = true
             joint = label
         } else {
-            // Create a default circular joint
+            //default circle joint if no emoji
             joint = UIView(frame: CGRect(x: position.x - jointSize / 2, y: position.y - jointSize / 2, width: jointSize, height: jointSize))
             joint.backgroundColor = jointColor
             joint.layer.cornerRadius = jointSize / 2
         }
 
         joint.addGestureRecognizer(UIPanGestureRecognizer(target: self, action: #selector(handlePan(_:))))
-        jointToLines[joint] = [] // Initialize the connected lines array
+        jointToLines[joint] = []
 
         return joint
     }
 
     private func connectJoints(from: UIView, to: UIView) {
-        let line = CAShapeLayer() // Allows me to use UIbezierpath later for drawing and updating the line
+        let line = CAShapeLayer() //allows me to use UIbezierpath later for drawing and updating the line
         line.strokeColor = limbColor.cgColor
         line.lineWidth = 2
         layer.addSublayer(line)
         lines.append(line)
 
-        // Add the line to the mappings for both joints
+        //add the lines to the mappings for joints
         jointToLines[from]?.append(line)
         jointToLines[to]?.append(line)
 
@@ -137,7 +138,7 @@ class StickFigureView: UIView {
         let fromPosition = convert(from.center, from: from.superview)
         let toPosition = convert(to.center, from: to.superview)
         
-        // Create a new path for the line
+        //update path for the line
         let path = UIBezierPath()
         path.move(to: fromPosition)
         path.addLine(to: toPosition)
@@ -147,7 +148,7 @@ class StickFigureView: UIView {
 
     private func updateJointColors() {
         for joint in joints {
-            // Only update background color for non-emoji joints (not UILabels)
+            //update background color for non-emoji joints
             if !(joint is UILabel) {
                 joint.backgroundColor = jointColor
             }
@@ -165,10 +166,9 @@ class StickFigureView: UIView {
         guard let joint = gesture.view else { return }
         let translation = gesture.translation(in: self)
         
-        // Calculate the new center
         var newCenter = CGPoint(x: joint.center.x + translation.x, y: joint.center.y + translation.y)
         
-        // Restrict movement to bounds
+        //keep moves within area, dont lose them in unaccesable area
         let jointRadius: CGFloat = joint.bounds.width / 2
         let allowedArea = CGRect(
             x: 0,
@@ -180,11 +180,11 @@ class StickFigureView: UIView {
         newCenter.x = max(allowedArea.minX + jointRadius, min(newCenter.x, allowedArea.maxX - jointRadius))
         newCenter.y = max(allowedArea.minY + jointRadius, min(newCenter.y, allowedArea.maxY - jointRadius))
         
-        // Update joint position
+        //update position of joints
         joint.center = newCenter
         gesture.setTranslation(.zero, in: self)
 
-        // Update all lines connected to this joint
+        //update all lines connected to this joint
         if let connectedLines = jointToLines[joint] {
             for line in connectedLines {
                 if let startJoint = joints.first(where: { jointToLines[$0]?.contains(line) == true && $0 != joint }) {
@@ -203,8 +203,6 @@ class StickFigureView: UIView {
             }
         }
     }
-
-
 }
 
 
