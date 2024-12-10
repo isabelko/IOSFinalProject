@@ -4,7 +4,6 @@
 //
 //  Created by Isak Sabelko on 11/19/24.
 //
-//will be a uinavcontroller
 
 import Foundation
 import UIKit
@@ -16,7 +15,7 @@ class SettingsViewController: UIViewController {
         view.backgroundColor = .systemBackground
         title = "Settings"
 
-        // Add a switch for enabling/disabling news
+        //switch for enabling/disabling news
         let disableNewsSwitch = UISwitch()
         disableNewsSwitch.isOn = !UserDefaults.standard.bool(forKey: "disableNews") // Default is news enabled
         disableNewsSwitch.addTarget(self, action: #selector(toggleNews(_:)), for: .valueChanged)
@@ -31,7 +30,6 @@ class SettingsViewController: UIViewController {
         view.addSubview(disableNewsSwitch)
         disableNewsSwitch.translatesAutoresizingMaskIntoConstraints = false
 
-        // Layout constraints for disable news switch and label
         NSLayoutConstraint.activate([
             disableNewsLabel.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 20),
             disableNewsLabel.centerYAnchor.constraint(equalTo: view.centerYAnchor),
@@ -45,7 +43,7 @@ class SettingsViewController: UIViewController {
         let isDisabled = !sender.isOn
         UserDefaults.standard.set(isDisabled, forKey: "disableNews")
 
-        // Notify MainNewsViewController about the change
+        //notify MainNewsViewController about the change
         NotificationCenter.default.post(name: Notification.Name("NewsVisibilityChanged"), object: nil)
     }
 }

@@ -183,7 +183,7 @@ class LogClimbViewController: UIViewController, UIImagePickerControllerDelegate,
             if let imageName = alert.textFields?.first?.text, !imageName.isEmpty {
                 completion(imageName)
             } else {
-                completion("Climb_\(UUID().uuidString)") // Fallback to default name if none provided
+                completion("Climb_\(UUID().uuidString)") //fallback to default if none
             }
         }
         let cancelAction = UIAlertAction(title: "Cancel", style: .cancel)
@@ -196,7 +196,7 @@ class LogClimbViewController: UIViewController, UIImagePickerControllerDelegate,
     private func showFolderPicker(for screenshot: UIImage, imageName: String) {
         let folderSelectionVC = FolderSelectionViewController()
         folderSelectionVC.fetchFolderNames = { [weak self] in
-            self?.loadFoldersFromFileSystem() ?? [] // Fetch updated folder list
+            self?.loadFoldersFromFileSystem() ?? [] //grab updated folder list
         }
         folderSelectionVC.onFolderSelected = { [weak self] selectedFolder in
             self?.saveScreenshot(screenshot, to: selectedFolder, withName: imageName)

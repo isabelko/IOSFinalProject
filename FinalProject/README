@@ -1,6 +1,7 @@
 ****************************
-* Overall Explination      *
+* FINAL PROJECT README     *
 ****************************
+
 -Climbing News
     -This is the first view that is loaded
     -Used swiftsoup to scrape url and news titles from climbing news website
@@ -8,6 +9,7 @@
      the top of the screen with an image while the other stories are normal
      stories and are displayed below it in a table
     -Clicking on story will take you to the url on safari and leave climbing app
+    
 -View Climbs
     -View climbs allows users to view the folders of different climbs
     -Within each folder contains the images of each step within a climb
@@ -16,10 +18,11 @@
     -can reorganize images within folder to then have a slideshow in order when
      clicking into image
     -Order of climbing images are saved between launches as well as folders and images
+    
 -Log Climb
-    -Can be shortcut to by swiping left anywhere in the app
+    -Can shortcut to this view by swiping right anywhere in the app
     -Upload image to the log climb screen by using setting at bottom middle
-    -Once uploading image you can move the stick figure to the desired
+    -Once you have uploaded the image you can move the stick figure to the desired
      position on the image
     -Can also change the color of the limbs or the joints within the settings
      at the bottom
@@ -27,19 +30,25 @@
      name for the image and then select folder to save it in
     -Saving is done by screenshotting the screen and saving it as a png
 -Settings
-    
+    -Allows users to disable the news section using a toggle
+    -uses notification center to update news tab
     
     
 -Struggles
-
+    -Getting a slider to decide the amount of stories to display, loved to
+     to keep stories in and make it more than desired amount or
+     place duplicates. Some sort of error with my fetching or resetting
+     how the way i store the stories
+    -Storing the steps of a climb and be able to edit them later, i gave up
+     and now just screenshot the climb and save it
 
 
 -Proudest Moments :)
-
-
-
+    -Scraping the website to display news stories
+    -I am proudest of my stick figure. It took AGES.
 
 -Plans for Future
-    
+    -Implement my struggles
+    -Allow for adding comments below photos for each move within a climb
 
 
