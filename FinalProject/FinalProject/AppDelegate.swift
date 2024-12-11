@@ -13,10 +13,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     var window: UIWindow?
 
     func application(_ application: UIApplication, supportedInterfaceOrientationsFor window: UIWindow?) -> UIInterfaceOrientationMask {
-        // Return the desired orientation(s)
-        return .portrait // Locks the app to portrait
-        // For landscape, use: .landscape
-        // For both landscape orientations, use: [.landscapeLeft, .landscapeRight]
+        return .portrait //locks the app to portrait
     }
 
 
